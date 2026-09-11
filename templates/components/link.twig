@@ -1,0 +1,1 @@
+{% macro navigate(href, text, redirectText) %}<a href="{{ href }}" data-redirect-text="{{ redirectText|default('Redirecting...') }}">{{ text }}</a>{% endmacro %}

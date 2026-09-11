@@ -1,0 +1,12 @@
+{% macro field(name, label, options, selected, error) %}
+    <div class="field">
+        <label for="field_{{ name }}">{{ label }}</label>
+        <select id="field_{{ name }}" name="{{ name }}" required>
+            <option value="">Select...</option>
+            {% for value, text in options %}
+                <option value="{{ value }}"{% if value == selected %} selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+        </select>
+        <div class="error">{{ error }}</div>
+    </div>
+{% endmacro %}

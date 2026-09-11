@@ -1,0 +1,27 @@
+{#
+    Client-side checks here deliberately mirror ValidationManager's rules
+    but stay looser than the server's exact regex where an exact mirror
+    would risk false negatives — the server in utilities/ValidationManager.php
+    remains the authoritative check either way. minPasswordLength is opt-in
+    per call site (not inferred from type="password") because it's a
+    signup/password-creation rule, not a login rule — login's password
+    field must never reject a real, already-set password that happens to
+    be shorter than the signup minimum.
+#}
+{% macro field(name, label, type, value, error, minPasswordLength) %}
+    <div class="field">
+        <label for="field_{{ name }}">{{ label }}</label>
+        <div class="input-wrap">
+            <input
+                type="{{ type }}"
+                id="field_{{ name }}"
+                name="{{ name }}"
+                value="{{ value }}"
+                required
+                {%- if type == 'password' and minPasswordLength %} minlength="{{ minPasswordLength }}" data-check-pwned{% endif %}
+                {%- if type == 'tel' %} placeholder="03001234567" pattern="[0-9+\-\s]{10,15}" title="Enter a Pakistani mobile number, e.g. 03001234567"{% endif %}
+            >
+        </div>
+        <div class="error">{{ error }}</div>
+    </div>
+{% endmacro %}

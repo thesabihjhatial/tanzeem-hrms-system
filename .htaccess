@@ -1,0 +1,15 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(core|apps|config|storage|tests|docs|vendor|utilities|sql)(/|$) - [F,L]
+    RewriteRule ^(composer\.(json|lock)|phinx\.php|manage\.php|phpunit\.xml|DEPLOY\.md)$ - [F,L]
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

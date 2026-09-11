@@ -1,0 +1,22 @@
+:root {
+    --ink: #1E2A38;
+    --ink-soft: #4B5A6A;
+    --paper: #EEECE1;
+    --surface: #FBFAF6;
+    --line: #D8D2C2;
+    --marigold: #C68A1E;
+    --marigold-soft: #F3E3C3;
+    --teal: #2F6B5E;
+    --teal-soft: #DEEAE6;
+    --brick: #A6402E;
+    --brick-soft: #F3DFDA;
+    --sp-1: 4px;
+    --sp-2: 8px;
+    --sp-3: 12px;
+    --sp-4: 16px;
+    --sp-5: 24px;
+    --sp-6: 32px;
+    --sp-7: 48px;
+    --font: 'IBM Plex Sans', -apple-system, sans-serif;
+    --radius: 4px;
+}

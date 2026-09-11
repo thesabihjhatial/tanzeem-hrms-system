@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Tests\Support;
+
+use PDO;
+
+trait SeedsBillingSchema
+{
+    protected function seedBillingSchema(PDO $pdo, bool $withDefaultPlan = true): void
+    {
+        $pdo->exec(<<<SQL
+            CREATE TABLE customers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                company_name TEXT NOT NULL,
+                phone TEXT NOT NULL,
+                province TEXT NOT NULL,
+                city TEXT NOT NULL,
+                employee_count_range TEXT NOT NULL,
+                ntn TEXT,
+                eobi_registration_no TEXT,
+                pessi_registration_no TEXT,
+                business_type TEXT,
+                created_at TEXT
+            )
+            SQL);
+
+        $pdo->exec(<<<SQL
+            CREATE TABLE users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customer_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE,
+                phone TEXT,
+                password_hash TEXT,
+                role TEXT NOT NULL,
+                created_at TEXT
+            )
+            SQL);
+
+        $pdo->exec(<<<SQL
+            CREATE TABLE auth_identities (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                provider TEXT NOT NULL,
+                provider_user_id TEXT NOT NULL,
+                created_at TEXT,
+                UNIQUE (provider, provider_user_id)
+            )
+            SQL);
+
+        $pdo->exec(<<<SQL
+            CREATE TABLE employees (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customer_id INTEGER NOT NULL,
+                first_name TEXT NOT NULL,
+                last_name TEXT NOT NULL,
+                email TEXT NOT NULL,
+                created_at TEXT
+            )
+            SQL);
+
+        $pdo->exec(<<<SQL
+            CREATE TABLE plans (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                price REAL NOT NULL,
+                employee_limit INTEGER NOT NULL,
+                billing_cycle TEXT NOT NULL,
+                is_default INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT
+            )
+            SQL);
+
+        $pdo->exec(<<<SQL
+            CREATE TABLE subscriptions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customer_id INTEGER NOT NULL,
+                plan_id INTEGER NOT NULL,
+                status TEXT NOT NULL,
+                trial_ends_at TEXT,
+                current_period_end TEXT,
+                created_at TEXT
+            )
+            SQL);
+
+        $pdo->exec(<<<SQL
+            CREATE TABLE invoices (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customer_id INTEGER NOT NULL,
+                subscription_id INTEGER NOT NULL,
+                amount REAL NOT NULL,
+                status TEXT NOT NULL,
+                issued_at TEXT,
+                paid_at TEXT
+            )
+            SQL);
+
+        if ($withDefaultPlan) {
+            $pdo->exec(<<<SQL
+                INSERT INTO plans (name, price, employee_limit, billing_cycle, is_default, created_at)
+                VALUES ('Starter Trial', 0, 10, 'monthly', 1, '2026-01-01 00:00:00')
+                SQL);
+        }
+    }
+}

@@ -1,0 +1,6 @@
+{% macro submit(text, variant, full) %}
+    <button type="submit" class="btn btn-{{ variant|default('primary') }}{% if full %} btn-full{% endif %}">
+        <span class="btn-label">{{ text }}</span>
+        <span class="btn-loader" hidden><span class="loader" aria-hidden="true"></span></span>
+    </button>
+{% endmacro %}

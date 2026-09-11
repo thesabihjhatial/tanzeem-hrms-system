@@ -1,0 +1,11 @@
+<div class="layout">
+    {% include "components/sidebar.twig" %}
+
+    <div class="main">
+        {% include "components/header.twig" %}
+        <div class="body">
+            {% block dashboard_content %}{% endblock %}
+        </div>
+        {% include "components/footer.twig" %}
+    </div>
+</div>

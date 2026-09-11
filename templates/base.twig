@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tanzeem{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/templates/tokens.css">
+    <link rel="stylesheet" href="/templates/design-system.css">
+</head>
+<body>
+    {% include "components/top-loader.twig" %}
+    {% block content %}{% endblock %}
+    <script src="/templates/assets/toast.js"></script>
+    <script src="/templates/assets/validation.js"></script>
+    <script src="/templates/assets/button-loading.js"></script>
+    <script src="/templates/assets/link-loading.js"></script>
+    <script src="/templates/assets/top-loader.js"></script>
+    {% for flash in flash_messages %}
+        <script>document.addEventListener('DOMContentLoaded', function () { if (window.Toast) { Toast.show({{ flash.message|json_encode|raw }}, {{ flash.type|json_encode|raw }}); } });</script>
+    {% endfor %}
+</body>
+</html>

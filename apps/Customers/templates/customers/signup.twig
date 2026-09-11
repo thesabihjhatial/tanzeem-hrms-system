@@ -1,0 +1,30 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    {% embed "components/auth-shell.twig" with {
+        title: 'Become a member',
+        wide: true,
+        switch_href: '/login?ref=signup',
+        switch_text: 'Already a member? Log in',
+    } %}
+        {% import "components/input.twig" as input %}
+        {% import "components/dropdown.twig" as dropdown %}
+        {% import "components/button.twig" as button %}
+
+        {% block auth_form %}
+            <form method="post" action="/signup" novalidate>
+                <div class="form-grid">
+                    {{ input.field('name', 'Your full name', 'text', old.name, errors.name) }}
+                    {{ input.field('company_name', 'Company name', 'text', old.company_name, errors.company_name) }}
+                    {{ input.field('phone', 'Phone number', 'tel', old.phone, errors.phone) }}
+                    {{ input.field('email', 'Email', 'email', old.email, errors.email) }}
+                    {{ input.field('password', 'Password', 'password', '', errors.password, 8) }}
+                    {{ dropdown.field('province', 'Province', provinces, old.province, errors.province) }}
+                    {{ input.field('city', 'City', 'text', old.city, errors.city) }}
+                    {{ dropdown.field('employee_count_range', 'Number of employees', employee_count_ranges, old.employee_count_range, errors.employee_count_range) }}
+                </div>
+                {{ button.submit('Sign up', 'primary', true) }}
+            </form>
+        {% endblock %}
+    {% endembed %}
+{% endblock %}

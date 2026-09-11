@@ -1,0 +1,15 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    {% set active_nav = 'employees' %}
+    {% set page_title = employee.first_name ~ ' ' ~ employee.last_name %}
+
+    {% embed "components/layout.twig" %}
+        {% block dashboard_content %}
+            <div class="tile">
+                <div class="label">Email</div>
+                <div class="value" style="font-size: 16px;">{{ employee.email }}</div>
+            </div>
+        {% endblock %}
+    {% endembed %}
+{% endblock %}

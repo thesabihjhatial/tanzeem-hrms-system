@@ -1,0 +1,21 @@
+{% import "components/link.twig" as link %}
+
+<div class="auth-split">
+    {% include "components/auth-banner.twig" %}
+
+    <div class="auth-form-panel">
+        <div class="auth-form-brand">Tanzeem</div>
+
+        <div class="auth-card{% if wide %} auth-card--wide{% endif %}">
+            <h1>{{ title }}</h1>
+
+            {% if error %}
+                <script>document.addEventListener('DOMContentLoaded', function () { if (window.Toast) { Toast.show({{ error|json_encode|raw }}, 'error'); } });</script>
+            {% endif %}
+
+            <p class="auth-switch">{{ link.navigate(switch_href, switch_text) }}</p>
+
+            {% block auth_form %}{% endblock %}
+        </div>
+    </div>
+</div>

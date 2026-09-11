@@ -1,0 +1,25 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    {% if show_splash %}
+        {% include "components/splash.twig" %}
+    {% endif %}
+
+    {% embed "components/auth-shell.twig" with {
+        title: 'Login',
+        error: error,
+        switch_href: '/signup',
+        switch_text: 'Not a member? Sign up',
+    } %}
+        {% import "components/input.twig" as input %}
+        {% import "components/button.twig" as button %}
+
+        {% block auth_form %}
+            <form method="post" action="/login" novalidate>
+                {{ input.field('email', 'Email', 'email', '', null) }}
+                {{ input.field('password', 'Password', 'password', '', null) }}
+                {{ button.submit('Login', 'primary', true) }}
+            </form>
+        {% endblock %}
+    {% endembed %}
+{% endblock %}

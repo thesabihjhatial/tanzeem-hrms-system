@@ -173,6 +173,15 @@ class AuthenticationManager
 
     }
 
+    public static function currentUser(): ?User
+    {
+
+        $userId = self::userId();
+
+        return $userId !== null ? User::find($userId) : null;
+
+    }
+
     private static function dummyHash(): string
     {
 

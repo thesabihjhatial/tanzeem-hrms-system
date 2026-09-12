@@ -12,6 +12,7 @@ trait SeedsBillingSchema
             CREATE TABLE customers (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 company_name TEXT NOT NULL,
+                customer_type TEXT NOT NULL DEFAULT 'individual',
                 phone TEXT NOT NULL,
                 province TEXT NOT NULL,
                 city TEXT NOT NULL,
@@ -31,7 +32,7 @@ trait SeedsBillingSchema
                 name TEXT NOT NULL,
                 email TEXT NOT NULL UNIQUE,
                 phone TEXT,
-                cnic TEXT,
+                id_number TEXT,
                 password_hash TEXT,
                 role TEXT NOT NULL,
                 created_at TEXT
@@ -75,9 +76,14 @@ trait SeedsBillingSchema
             CREATE TABLE employees (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 customer_id INTEGER NOT NULL,
+                employee_id TEXT,
                 first_name TEXT NOT NULL,
                 last_name TEXT NOT NULL,
+                department TEXT,
+                designation TEXT,
                 email TEXT NOT NULL,
+                phone TEXT,
+                city TEXT,
                 created_at TEXT
             )
             SQL);

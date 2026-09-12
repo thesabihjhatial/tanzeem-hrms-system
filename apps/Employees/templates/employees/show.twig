@@ -6,9 +6,31 @@
 
     {% embed "components/layout.twig" %}
         {% block dashboard_content %}
-            <div class="tile">
-                <div class="label">Email</div>
-                <div class="value" style="font-size: 16px;">{{ employee.email }}</div>
+            <div class="stat-cards">
+                <div class="stat-card">
+                    <div class="stat-card-label">Employee ID</div>
+                    <div class="stat-card-value" style="font-size: 16px;">{{ employee.employee_id }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Department</div>
+                    <div class="stat-card-value" style="font-size: 16px;">{{ employee.department }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Designation</div>
+                    <div class="stat-card-value" style="font-size: 16px;">{{ employee.designation }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Email</div>
+                    <div class="stat-card-value" style="font-size: 16px;">{{ employee.email }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">Phone</div>
+                    <div class="stat-card-value" style="font-size: 16px;">{{ employee.phone }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-label">City</div>
+                    <div class="stat-card-value" style="font-size: 16px;">{{ employee.city }}</div>
+                </div>
             </div>
         {% endblock %}
     {% endembed %}

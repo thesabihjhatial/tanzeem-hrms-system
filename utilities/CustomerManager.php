@@ -24,6 +24,8 @@ class CustomerManager
 
     private const ERROR_EMAIL_TAKEN = 'This email is already registered.';
 
+    private const ERROR_NTN_TAKEN = 'This NTN is already registered.';
+
     private const ERROR_OTP_EXPIRED = 'Your verification session has expired. Please start over.';
 
     private const ERROR_OTP_INCORRECT = 'Incorrect verification code.';
@@ -32,7 +34,7 @@ class CustomerManager
 
     private const ERROR_PASSWORD_MISMATCH = 'The passwords do not match.';
 
-    private const ERROR_REGISTRATION_FAILED = 'Something went wrong.';
+    private const ERROR_REGISTRATION_FAILED = 'Account creation failed. The incident has been logged for investigation.';
 
     private const LOG_SOURCE = 'CustomerManager';
 
@@ -53,6 +55,8 @@ class CustomerManager
         'punjab' => 'Punjab',
         'sindh' => 'Sindh',
     ];
+
+    public const ROLE_ADMIN = 'admin';
 
     public const ROLE_OWNER = 'owner';
 
@@ -80,7 +84,7 @@ class CustomerManager
 
         }
 
-        $errors = ValidationManager::validate($data, self::registrationRules());
+        $errors = ValidationManager::validate($data, self::registrationRules($data));
 
         if (!isset($errors['confirm_password']) && ($data['password'] ?? '') !== ($data['confirm_password'] ?? '')) {
 
@@ -114,9 +118,11 @@ class CustomerManager
 
         }
 
-        if (self::findUserByCnic($data['cnic']) !== null) {
+        $customerType = ($data['customer_type'] ?? 'individual') === 'company' ? 'company' : 'individual';
 
-            return ['success' => false, 'errors' => ['cnic' => self::ERROR_CNIC_TAKEN]];
+        if (self::findUserByIdNumber($data['cnic']) !== null) {
+
+            return ['success' => false, 'errors' => ['cnic' => $customerType === 'company' ? self::ERROR_NTN_TAKEN : self::ERROR_CNIC_TAKEN]];
 
         }
 
@@ -125,6 +131,7 @@ class CustomerManager
         $payload = [
             'customer' => [
                 'company_name' => $data['company_name'],
+                'customer_type' => $customerType,
                 'phone' => $data['phone'],
                 'province' => $data['province'],
                 'city' => $data['city'],
@@ -134,7 +141,7 @@ class CustomerManager
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'phone' => $data['phone'],
-                'cnic' => $data['cnic'],
+                'id_number' => $data['cnic'],
                 'password_hash' => password_hash($data['password'], PASSWORD_ARGON2ID),
             ],
         ];
@@ -225,14 +232,16 @@ class CustomerManager
 
             $customer = Customer::create($payload['customer']);
 
+            $role = $payload['customer']['customer_type'] === 'company' ? self::ROLE_OWNER : self::ROLE_ADMIN;
+
             $user = User::create([
                 'customer_id' => $customer->id,
                 'name' => $payload['user']['name'],
                 'email' => $payload['user']['email'],
                 'phone' => $payload['user']['phone'],
-                'cnic' => $payload['user']['cnic'],
+                'id_number' => $payload['user']['id_number'],
                 'password_hash' => $payload['user']['password_hash'],
-                'role' => self::ROLE_OWNER,
+                'role' => $role,
             ]);
 
             $subscription = SubscriptionManager::startTrial($customer->id, $planId);
@@ -295,10 +304,10 @@ class CustomerManager
 
     }
 
-    public static function findUserByCnic(string $cnic): ?User
+    public static function findUserByIdNumber(string $idNumber): ?User
     {
 
-        return User::findByCnic($cnic);
+        return User::findByIdNumber($idNumber);
 
     }
 
@@ -316,15 +325,23 @@ class CustomerManager
 
     }
 
-    /** @return array<string, array<int, string|array{0: string, 1: mixed}>> */
-    private static function registrationRules(): array
+    /** @param array<string, mixed> $data @return array<string, array<int, string|array{0: string, 1: mixed}>> */
+    private static function registrationRules(array $data): array
     {
 
+        $isCompany = ($data['customer_type'] ?? 'individual') === 'company';
+
+        $nameRules = $isCompany
+            ? ['required']
+            : ['required', 'min:5', 'safe_text', 'has_letter', 'not_monotonous'];
+
+        $cnicRules = $isCompany ? ['required', 'ntn_pk'] : ['required', 'cnic_pk'];
+
         return [
-            'name' => ['required', 'min:5', 'safe_text', 'has_letter', 'not_monotonous'],
+            'name' => $nameRules,
             'company_name' => ['required', 'min:3', 'safe_text', 'has_letter', 'not_monotonous'],
             'phone' => ['required', 'phone_pk'],
-            'cnic' => ['required', 'cnic_pk'],
+            'cnic' => $cnicRules,
             'email' => ['required', 'email', 'not_disposable_email'],
             'password' => ['required', 'min:8'],
             'confirm_password' => ['required'],

@@ -7,6 +7,10 @@
  * of Django's INSTALLED_APPS.
  */
 return [
+    'dashboard' => [
+        'namespace' => 'App\\Apps\\Dashboard',
+        'path' => __DIR__ . '/../apps/Dashboard',
+    ],
     'customers' => [
         'namespace' => 'App\\Apps\\Customers',
         'path' => __DIR__ . '/../apps/Customers',

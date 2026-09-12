@@ -24,6 +24,7 @@
                 {%- if type == 'email' and checkEmailAvailable %} data-check-email{% endif %}
                 {%- if type == 'tel' %} placeholder="03001234567" pattern="[0-9+\-\s]{10,15}" title="Enter a Pakistani mobile number, e.g. 03001234567"{% endif %}
                 {%- if name == 'cnic' %} placeholder="12345-1234567-1" pattern="[0-9\-]{13,15}" title="Enter a valid 13-digit CNIC, e.g. 12345-1234567-1" data-check-cnic{% endif %}
+                {%- if name == 'ntn' %} placeholder="1234567-8" pattern="[A-Za-z0-9\-]{7,9}" title="Enter a valid NTN, e.g. 1234567-8"{% endif %}
                 {%- if name == 'otp' %} placeholder="123456" inputmode="numeric" pattern="\d{6}" maxlength="6" autocomplete="one-time-code" title="Enter the 6-digit verification code"{% endif %}
             >
             {%- if type == 'password' %}

@@ -70,6 +70,11 @@
         return /^\d{13}$/.test(normalized) && !isMonotonous(normalized);
     }
 
+    function isValidNtn(value) {
+        var normalized = value.replace(/[\s-]/g, '').toUpperCase();
+        return /^[A-Z0-9]{7,8}$/.test(normalized) && !isMonotonous(normalized);
+    }
+
     function isSafeText(value) {
         return /^[a-zA-Z0-9\s.,'&-]+$/.test(value);
     }
@@ -118,6 +123,16 @@
     }
 
     function validateField(el) {
+        // A real type="hidden" data carrier (e.g. the OTP field) is always
+        // "invisible" by nature and must still be validated. A normal
+        // input/select that's merely hidden right now — the customer-type
+        // toggle hides "ntn" in individual mode, "cnic" in company mode,
+        // "name" in company mode — represents nothing the user could have
+        // filled in, so it's never a reason to block submission.
+        if (el.type !== 'hidden' && el.offsetParent === null) {
+            return true;
+        }
+
         var value = el.value.trim();
 
         if (el.hasAttribute('required') && value === '') {
@@ -142,6 +157,11 @@
 
         if (el.name === 'cnic' && value !== '' && !isValidCnic(value)) {
             setError(el, 'Enter a valid 13-digit CNIC, e.g. 12345-1234567-1.');
+            return false;
+        }
+
+        if (el.name === 'ntn' && value !== '' && !isValidNtn(value)) {
+            setError(el, 'Enter a valid NTN number, e.g. 1234567-8.');
             return false;
         }
 
@@ -326,6 +346,9 @@
 
         var fields = form.querySelectorAll('input[required], select[required]');
         var hasEmptyField = Array.prototype.some.call(fields, function (field) {
+            if (field.type !== 'hidden' && field.offsetParent === null) {
+                return false;
+            }
             return field.value.trim() === '';
         });
 
@@ -334,6 +357,11 @@
         // treats it the same way server-side.
         var errorEls = form.querySelectorAll('.error:not(.error--warning)');
         var hasVisibleError = Array.prototype.some.call(errorEls, function (errorEl) {
+            // A stale error left over in a field the customer-type toggle
+            // has since hidden must not permanently block submission.
+            if (errorEl.offsetParent === null) {
+                return false;
+            }
             return errorEl.textContent.trim() !== '';
         });
 

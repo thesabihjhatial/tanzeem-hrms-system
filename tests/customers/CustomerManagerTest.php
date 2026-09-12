@@ -39,8 +39,16 @@ class CustomerManagerTest extends TestCase
         $this->assertSame('punjab', $result['customer']->province);
         $this->assertSame($result['customer']->id, $result['user']->customer_id);
         $this->assertSame('03001234567', $result['user']->phone);
-        $this->assertSame('owner', $result['user']->role);
+        $this->assertSame('admin', $result['user']->role);
         $this->assertTrue(password_verify('correct horse battery staple', $result['user']->password_hash));
+    }
+
+    public function test_register_gives_company_customers_the_owner_role(): void
+    {
+        $result = $this->registerCustomer(['customer_type' => 'company', 'cnic' => 'NTN123X']);
+
+        $this->assertTrue($result['success']);
+        $this->assertSame('owner', $result['user']->role);
     }
 
     public function test_register_also_starts_a_trial_subscription(): void

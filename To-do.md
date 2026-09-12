@@ -1,3 +1,3 @@
+Logo/Brand/Favicon
 Banner
-Email sending system
-OTP on email
+Email manager and OTP emails

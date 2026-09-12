@@ -16,9 +16,14 @@ class EmployeeModelTest extends TestCase
             CREATE TABLE employees (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 customer_id INTEGER NOT NULL,
+                employee_id TEXT,
                 first_name TEXT NOT NULL,
                 last_name TEXT NOT NULL,
+                department TEXT,
+                designation TEXT,
                 email TEXT NOT NULL,
+                phone TEXT,
+                city TEXT,
                 created_at TEXT,
                 UNIQUE (customer_id, email)
             )

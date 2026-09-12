@@ -1,3 +1,66 @@
+{% import "components/link.twig" as link %}
+
 <header class="header">
-    <h3>{{ page_title }}</h3>
+    <div class="header-title">
+        <button type="button" class="mobile-nav-toggle" id="mobileNavToggle" aria-label="Open menu">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h3>{{ page_title }}</h3>
+    </div>
+    <div class="header-actions">
+        {% if current_user %}
+            <div class="profile" id="profile">
+                <button type="button" class="profile-trigger" id="profileTrigger" aria-haspopup="true" aria-expanded="false">
+                    <span class="profile-info">
+                        <span class="profile-name">{{ current_user.name }}</span>
+                        <span class="profile-role">{{ current_user.role|capitalize }}</span>
+                    </span>
+                    <span class="profile-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </span>
+                    <svg class="profile-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="profile-menu" id="profileMenu" hidden>
+                    <a href="#">Settings</a>
+                    {{ link.navigate('/logout', 'Log out', null, 'Are you sure you wish to logout?', 'Confirm logout') }}
+                </div>
+            </div>
+        {% endif %}
+    </div>
 </header>
+
+<script>
+(function () {
+    var profile = document.getElementById('profile');
+    if (!profile) {
+        return;
+    }
+
+    var trigger = document.getElementById('profileTrigger');
+    var menu = document.getElementById('profileMenu');
+
+    function close() {
+        menu.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    trigger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var opening = menu.hidden;
+        menu.hidden = !opening;
+        trigger.setAttribute('aria-expanded', opening ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!profile.contains(e.target)) {
+            close();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            close();
+        }
+    });
+})();
+</script>

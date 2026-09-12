@@ -1,1 +1,1 @@
-{% macro navigate(href, text, redirectText) %}<a href="{{ href }}" data-redirect-text="{{ redirectText|default('Redirecting...') }}">{{ text }}</a>{% endmacro %}
+{% macro navigate(href, text, redirectText, confirm, confirmTitle) %}<a href="{{ href }}" data-redirect-text="{{ redirectText|default('Redirecting...') }}"{% if confirm %} data-confirm="{{ confirm }}"{% if confirmTitle %} data-confirm-title="{{ confirmTitle }}"{% endif %}{% endif %}>{{ text }}</a>{% endmacro %}

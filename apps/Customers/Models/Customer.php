@@ -9,6 +9,7 @@ class Customer
     public function __construct(
         public readonly int $id,
         public readonly string $company_name,
+        public readonly string $customer_type,
         public readonly string $phone,
         public readonly string $province,
         public readonly string $city,
@@ -27,13 +28,14 @@ class Customer
         return $row ? self::fromRow($row) : null;
     }
 
-    /** @param array{company_name: string, phone: string, province: string, city: string, employee_count_range: string} $data */
+    /** @param array{company_name: string, customer_type: string, phone: string, province: string, city: string, employee_count_range: string} $data */
     public static function create(array $data): self
     {
         DatabaseManager::execute(
-            'INSERT INTO customers (company_name, phone, province, city, employee_count_range, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+            'INSERT INTO customers (company_name, customer_type, phone, province, city, employee_count_range, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
             [
                 $data['company_name'],
+                $data['customer_type'],
                 $data['phone'],
                 $data['province'],
                 $data['city'],
@@ -51,6 +53,7 @@ class Customer
         return new self(
             (int) $row['id'],
             $row['company_name'],
+            $row['customer_type'],
             $row['phone'],
             $row['province'],
             $row['city'],

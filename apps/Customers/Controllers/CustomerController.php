@@ -100,7 +100,7 @@ class CustomerController extends Controller
 
         FlashManager::add('Welcome to Tanzeem!', 'success');
 
-        return $this->redirect('/employees');
+        return $this->redirect('/dashboard');
     }
 
     public function showLogin(Request $request): Response
@@ -125,7 +125,7 @@ class CustomerController extends Controller
             return $this->loginView('Credentials are invalid.', false);
         }
 
-        return $this->redirect('/employees');
+        return $this->redirect('/dashboard');
     }
 
     public function logout(Request $request): Response
@@ -166,7 +166,7 @@ class CustomerController extends Controller
      */
     public function checkCnic(Request $request): Response
     {
-        $taken = CustomerManager::findUserByCnic($request->body['cnic'] ?? '') !== null;
+        $taken = CustomerManager::findUserByIdNumber($request->body['cnic'] ?? '') !== null;
 
         return $this->json(['taken' => $taken]);
     }

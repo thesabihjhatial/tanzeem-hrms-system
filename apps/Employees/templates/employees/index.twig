@@ -6,21 +6,27 @@
 
     {% embed "components/layout.twig" %}
         {% block dashboard_content %}
-            <table class="ledger">
-                <thead>
-                    <tr><th>Name</th><th>Email</th></tr>
-                </thead>
-                <tbody>
-                    {% for employee in employees %}
-                        <tr>
-                            <td><a href="/employees/{{ employee.id }}">{{ employee.first_name }} {{ employee.last_name }}</a></td>
-                            <td>{{ employee.email }}</td>
-                        </tr>
-                    {% else %}
-                        <tr><td colspan="2">No employees yet.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-scroll">
+                <table class="ledger">
+                    <thead>
+                        <tr><th>Employee ID</th><th>Name</th><th>Department</th><th>Designation</th><th>City</th><th>Email</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in employees %}
+                            <tr>
+                                <td>{{ employee.employee_id }}</td>
+                                <td><a href="/employees/{{ employee.id }}">{{ employee.first_name }} {{ employee.last_name }}</a></td>
+                                <td>{{ employee.department }}</td>
+                                <td>{{ employee.designation }}</td>
+                                <td>{{ employee.city }}</td>
+                                <td>{{ employee.email }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="6">No employees yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         {% endblock %}
     {% endembed %}
 {% endblock %}

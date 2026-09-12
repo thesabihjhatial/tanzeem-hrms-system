@@ -98,6 +98,18 @@ class ValidationManager
 
     }
 
+    public static function isValidNtn(string $ntn): bool
+    {
+
+        // NTNs can be alphanumeric (FBR issues some as letters+digits),
+        // unlike CNIC/phone which are numeric-only — so the monotonous
+        // check here works on whatever characters are actually present.
+        $normalized = strtoupper(preg_replace('/[\s\-]/', '', $ntn));
+
+        return (bool) preg_match('/^[A-Z0-9]{7,8}$/', $normalized) && !self::isMonotonous($normalized);
+
+    }
+
     public static function isValidPakistaniPhone(string $phone): bool
     {
 
@@ -109,7 +121,6 @@ class ValidationManager
 
         }
 
-        // Reject fakes like 03000000000 — a valid-looking prefix with a monotonous subscriber number.
         return !self::isMonotonous(substr($normalized, -9));
 
     }
@@ -180,6 +191,7 @@ class ValidationManager
             $name === 'not_disposable_email' && $value !== '' && self::isDisposableEmailDomain((string) $value) => 'Please use permanent email address, not a temporary one.',
             $name === 'phone_pk' && $value !== '' && !self::isValidPakistaniPhone((string) $value) => 'Enter a valid Pakistani number, e.g. 03001234567 or +923001234567.',
             $name === 'cnic_pk' && $value !== '' && !self::isValidCnic((string) $value) => 'Enter a valid 13-digit CNIC, e.g. 12345-1234567-1.',
+            $name === 'ntn_pk' && $value !== '' && !self::isValidNtn((string) $value) => 'Enter a valid NTN number, e.g. 1234567-8.',
             is_string($name) && str_starts_with($name, 'min:') && $value !== '' && strlen((string) $value) < (int) substr($name, 4) => 'Must be least ' . substr($name, 4) . ' characters.',
             $name === 'in' && $value !== '' && !in_array($value, $param ?? [], true) => 'Please select a valid option.',
             $name === 'safe_text' && $value !== '' && !preg_match(self::SAFE_TEXT_PATTERN, (string) $value) => 'Contains characters that aren\'t allowed.',

@@ -2,6 +2,7 @@
 
 namespace App\Core;
 
+use App\Utilities\AuthenticationManager;
 use App\Utilities\FlashManager;
 
 abstract class Controller
@@ -10,6 +11,7 @@ abstract class Controller
     protected function view(string $template, array $data = []): Response
     {
         $data['flash_messages'] ??= FlashManager::consume();
+        $data['current_user'] ??= AuthenticationManager::currentUser();
 
         return Response::html(View::render($template, $data));
     }

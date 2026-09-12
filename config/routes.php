@@ -7,5 +7,5 @@
  * Add site-wide routes (health checks, etc.) here.
  */
 return function (\App\Core\Router $router): void {
-    $router->get('/', 'App\\Apps\\Employees\\Controllers\\EmployeeController@index');
+    $router->get('/', 'App\\Apps\\Dashboard\\Controllers\\DashboardController@index');
 };

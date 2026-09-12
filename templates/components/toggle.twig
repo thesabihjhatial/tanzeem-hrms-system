@@ -1,0 +1,19 @@
+{#
+    A generic segmented toggle backed by one hidden input — reusable
+    anywhere a page needs a small set of mutually-exclusive options
+    (e.g. signup's Individual/Company switch). The mechanics (which
+    option is active, keeping the hidden input in sync) live in
+    assets/toggle.js; a page reacts to the choice by listening for the
+    "toggle:change" event dispatched on the hidden input, so this
+    component itself never needs to know what a given page does with it.
+
+    options: array of {value, label}
+#}
+{% macro field(name, options, selectedValue) %}
+    <div class="toggle" data-toggle-name="{{ name }}">
+        {% for option in options %}
+            <button type="button" class="toggle-option{% if option.value == selectedValue %} active{% endif %}" data-value="{{ option.value }}">{{ option.label }}</button>
+        {% endfor %}
+    </div>
+    <input type="hidden" name="{{ name }}" id="field_{{ name }}" value="{{ selectedValue }}">
+{% endmacro %}

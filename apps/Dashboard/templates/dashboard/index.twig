@@ -1,0 +1,39 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    {% set active_nav = 'dashboard' %}
+    {% set page_title = 'Dashboard' %}
+
+    {% embed "components/layout.twig" %}
+        {% import "components/stat-card.twig" as stat %}
+
+        {% block dashboard_content %}
+            <h2 class="dashboard-welcome" data-user-name="{{ user_name }}">{{ greeting }}{% if user_name %}, {{ user_name }}{% endif %}</h2>
+            <script>
+                // The server-rendered greeting above is a best-effort fallback
+                // (server clock, not the visitor's) — this corrects it to the
+                // visitor's own local time the moment the page loads.
+                document.addEventListener('DOMContentLoaded', function () {
+                    var el = document.querySelector('.dashboard-welcome');
+                    if (!el) {
+                        return;
+                    }
+
+                    var hour = new Date().getHours();
+                    var greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+                    var name = el.dataset.userName;
+
+                    el.textContent = name ? greeting + ', ' + name : greeting;
+                });
+            </script>
+
+            <div class="stat-cards">
+                {{ stat.card('Employees', employee_count, employee_limit ? '/ ' ~ employee_limit : null) }}
+                {{ stat.card('Plan', plan_name ?? '—', null, true) }}
+                {{ stat.card('Subscription', subscription_status ? subscription_status|capitalize : '—') }}
+                {{ stat.card('On leave', '—') }}
+                {{ stat.card("This month's payroll", '—') }}
+            </div>
+        {% endblock %}
+    {% endembed %}
+{% endblock %}

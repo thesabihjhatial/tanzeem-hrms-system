@@ -10,8 +10,14 @@
         {% import "components/input.twig" as input %}
         {% import "components/dropdown.twig" as dropdown %}
         {% import "components/button.twig" as button %}
+        {% import "components/toggle.twig" as toggle %}
 
         {% block auth_form %}
+            {{ toggle.field('customer_type', [
+                {value: 'individual', label: 'Individual'},
+                {value: 'company', label: 'Company'},
+            ], old.customer_type ?? 'individual') }}
+
             <form method="post" action="/signup" novalidate>
                 <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                 <input type="hidden" name="form_token" value="{{ form_token }}">
@@ -20,7 +26,7 @@
                     <input type="text" id="field_tzm_hp" name="tzm_hp" tabindex="-1" autocomplete="off">
                 </div>
                 <div class="form-grid">
-                    <div class="form-row form-row-2">
+                    <div class="form-row form-row-2" id="nameCompanyRow">
                         {{ input.field('name', 'Your full name', 'text', old.name, errors.name) }}
                         {{ input.field('company_name', 'Company name', 'text', old.company_name, errors.company_name) }}
                     </div>
@@ -29,9 +35,10 @@
                         {{ input.field('password', 'Password', 'password', '', errors.password, 8) }}
                         {{ input.field('confirm_password', 'Confirm your password', 'password', '', errors.confirm_password) }}
                     </div>
-                    <div class="form-row form-row-2">
+                    <div class="form-row form-row-2" id="cnicNtnRow">
                         {{ input.field('phone', 'Contact', 'tel', old.phone, errors.phone) }}
                         {{ input.field('cnic', 'CNIC', 'text', old.cnic, errors.cnic) }}
+                        {{ input.field('ntn', 'NTN', 'text', old.cnic, errors.cnic) }}
                     </div>
                     <div class="form-row form-row-3">
                         {{ dropdown.field('province', 'Province', provinces, old.province, errors.province) }}
@@ -41,6 +48,55 @@
                 </div>
                 {{ button.submit('Verify your identity', 'primary', true) }}
             </form>
+
+            <script>
+            (function () {
+                var typeInput = document.getElementById('field_customer_type');
+                var nameRow = document.getElementById('nameCompanyRow');
+                var cnicRow = document.getElementById('cnicNtnRow');
+                var nameInput = document.getElementById('field_name');
+                var companyInput = document.getElementById('field_company_name');
+                var cnicInput = document.getElementById('field_cnic');
+                var ntnInput = document.getElementById('field_ntn');
+
+                function apply(type) {
+                    var isCompany = type === 'company';
+
+                    nameRow.classList.toggle('company-mode', isCompany);
+                    cnicInput.closest('.field').hidden = isCompany;
+                    ntnInput.closest('.field').hidden = !isCompany;
+
+                    if (isCompany) {
+                        nameInput.value = companyInput.value;
+                        cnicInput.value = ntnInput.value;
+                    }
+                }
+
+                typeInput.addEventListener('toggle:change', function (e) {
+                    apply(e.detail.value);
+                });
+
+                // Whichever visible field is the source of truth in the
+                // current mode keeps mirroring into the hidden field the
+                // server actually reads — name<-company_name, cnic<-ntn.
+                companyInput.addEventListener('input', function () {
+                    if (typeInput.value === 'company') {
+                        nameInput.value = companyInput.value;
+                    }
+                });
+                ntnInput.addEventListener('input', function () {
+                    if (typeInput.value === 'company') {
+                        cnicInput.value = ntnInput.value;
+                    }
+                });
+
+                // Re-apply on load too (not just on click) — a validation
+                // failure re-renders the page with old.customer_type already
+                // set to "company", and the layout must reflect that
+                // immediately rather than waiting for another click.
+                apply(typeInput.value);
+            })();
+            </script>
         {% endblock %}
     {% endembed %}
 {% endblock %}

@@ -26,11 +26,16 @@
 
         clearInterval(timer);
         timer = setInterval(function () {
-            // Creep toward 90%, slowing as it approaches — never reaches
-            // 100% under its own steam, since nothing here ever calls it done.
-            width += (90 - width) * 0.1;
+            // Creep toward 99%, slowing as it approaches — never reaches
+            // 100% under its own steam, since nothing here ever calls it
+            // done. Fast (25%-of-remaining-distance, every 50ms) so a
+            // quick page load still visually races to near-completion
+            // instead of getting caught at a low percentage when the
+            // page unloads out from under it — only a genuinely slow
+            // load lingers, still climbing, near the top.
+            width += (99 - width) * 0.25;
             bar.style.width = width + '%';
-        }, 200);
+        }, 50);
     }
 
     window.addEventListener('beforeunload', start);

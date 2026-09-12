@@ -9,9 +9,14 @@ class Employee
     public function __construct(
         public readonly int $id,
         public readonly int $customer_id,
+        public readonly ?string $employee_id,
         public readonly string $first_name,
         public readonly string $last_name,
+        public readonly ?string $department,
+        public readonly ?string $designation,
         public readonly string $email,
+        public readonly ?string $phone,
+        public readonly ?string $city,
     ) {
     }
 
@@ -30,12 +35,38 @@ class Employee
         return $row ? self::fromRow($row) : null;
     }
 
-    /** @param array{first_name: string, last_name: string, email: string} $data */
+    public static function maxNumericEmployeeId(int $customerId): int
+    {
+        $rows = DatabaseManager::select('SELECT employee_id FROM employees WHERE customer_id = ? AND employee_id IS NOT NULL', [$customerId]);
+
+        $max = 0;
+
+        foreach ($rows as $row) {
+            if (preg_match('/(\d+)$/', (string) $row['employee_id'], $matches)) {
+                $max = max($max, (int) $matches[1]);
+            }
+        }
+
+        return $max;
+    }
+
+    /** @param array{employee_id?: ?string, first_name: string, last_name: string, department?: ?string, designation?: ?string, email: string, phone?: ?string, city?: ?string} $data */
     public static function create(int $customerId, array $data): self
     {
         DatabaseManager::execute(
-            'INSERT INTO employees (customer_id, first_name, last_name, email, created_at) VALUES (?, ?, ?, ?, ?)',
-            [$customerId, $data['first_name'], $data['last_name'], $data['email'], date('Y-m-d H:i:s')],
+            'INSERT INTO employees (customer_id, employee_id, first_name, last_name, department, designation, email, phone, city, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+                $customerId,
+                $data['employee_id'] ?? null,
+                $data['first_name'],
+                $data['last_name'],
+                $data['department'] ?? null,
+                $data['designation'] ?? null,
+                $data['email'],
+                $data['phone'] ?? null,
+                $data['city'] ?? null,
+                date('Y-m-d H:i:s'),
+            ],
         );
 
         return self::find($customerId, (int) DatabaseManager::lastInsertId());
@@ -44,6 +75,17 @@ class Employee
     /** @param array<string, mixed> $row */
     private static function fromRow(array $row): self
     {
-        return new self((int) $row['id'], (int) $row['customer_id'], $row['first_name'], $row['last_name'], $row['email']);
+        return new self(
+            (int) $row['id'],
+            (int) $row['customer_id'],
+            $row['employee_id'],
+            $row['first_name'],
+            $row['last_name'],
+            $row['department'],
+            $row['designation'],
+            $row['email'],
+            $row['phone'],
+            $row['city'],
+        );
     }
 }

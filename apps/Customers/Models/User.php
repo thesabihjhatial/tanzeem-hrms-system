@@ -12,6 +12,7 @@ class User
         public readonly string $name,
         public readonly string $email,
         public readonly ?string $phone,
+        public readonly ?string $cnic,
         public readonly ?string $password_hash,
         public readonly string $role,
     ) {
@@ -31,16 +32,24 @@ class User
         return $row ? self::fromRow($row) : null;
     }
 
-    /** @param array{customer_id: int, name: string, email: string, phone: ?string, password_hash: ?string, role: string} $data */
+    public static function findByCnic(string $cnic): ?self
+    {
+        $row = DatabaseManager::selectOne('SELECT * FROM users WHERE cnic = ?', [$cnic]);
+
+        return $row ? self::fromRow($row) : null;
+    }
+
+    /** @param array{customer_id: int, name: string, email: string, phone: ?string, cnic: ?string, password_hash: ?string, role: string} $data */
     public static function create(array $data): self
     {
         DatabaseManager::execute(
-            'INSERT INTO users (customer_id, name, email, phone, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO users (customer_id, name, email, phone, cnic, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $data['customer_id'],
                 $data['name'],
                 $data['email'],
                 $data['phone'] ?? null,
+                $data['cnic'] ?? null,
                 $data['password_hash'] ?? null,
                 $data['role'],
                 date('Y-m-d H:i:s'),
@@ -59,6 +68,7 @@ class User
             $row['name'],
             $row['email'],
             $row['phone'],
+            $row['cnic'],
             $row['password_hash'],
             $row['role'],
         );

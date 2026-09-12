@@ -13,17 +13,33 @@
 
         {% block auth_form %}
             <form method="post" action="/signup" novalidate>
-                <div class="form-grid">
-                    {{ input.field('name', 'Your full name', 'text', old.name, errors.name) }}
-                    {{ input.field('company_name', 'Company name', 'text', old.company_name, errors.company_name) }}
-                    {{ input.field('phone', 'Phone number', 'tel', old.phone, errors.phone) }}
-                    {{ input.field('email', 'Email', 'email', old.email, errors.email) }}
-                    {{ input.field('password', 'Password', 'password', '', errors.password, 8) }}
-                    {{ dropdown.field('province', 'Province', provinces, old.province, errors.province) }}
-                    {{ input.field('city', 'City', 'text', old.city, errors.city) }}
-                    {{ dropdown.field('employee_count_range', 'Number of employees', employee_count_ranges, old.employee_count_range, errors.employee_count_range) }}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="form_token" value="{{ form_token }}">
+                <div class="field-trap" aria-hidden="true">
+                    <label for="field_tzm_hp">Leave this field blank</label>
+                    <input type="text" id="field_tzm_hp" name="tzm_hp" tabindex="-1" autocomplete="off">
                 </div>
-                {{ button.submit('Sign up', 'primary', true) }}
+                <div class="form-grid">
+                    <div class="form-row form-row-2">
+                        {{ input.field('name', 'Your full name', 'text', old.name, errors.name) }}
+                        {{ input.field('company_name', 'Company name', 'text', old.company_name, errors.company_name) }}
+                    </div>
+                    <div class="form-row form-row-3">
+                        {{ input.field('email', 'Email', 'email', old.email, errors.email, null, true) }}
+                        {{ input.field('password', 'Password', 'password', '', errors.password, 8) }}
+                        {{ input.field('confirm_password', 'Confirm your password', 'password', '', errors.confirm_password) }}
+                    </div>
+                    <div class="form-row form-row-2">
+                        {{ input.field('phone', 'Contact', 'tel', old.phone, errors.phone) }}
+                        {{ input.field('cnic', 'CNIC', 'text', old.cnic, errors.cnic) }}
+                    </div>
+                    <div class="form-row form-row-3">
+                        {{ dropdown.field('province', 'Province', provinces, old.province, errors.province) }}
+                        {{ input.field('city', 'City', 'text', old.city, errors.city) }}
+                        {{ dropdown.field('employee_count_range', 'Number of employees', employee_count_ranges, old.employee_count_range, errors.employee_count_range) }}
+                    </div>
+                </div>
+                {{ button.submit('Verify your identity', 'primary', true) }}
             </form>
         {% endblock %}
     {% endembed %}

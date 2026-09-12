@@ -30,6 +30,14 @@ class Plan
         return $row ? self::fromRow($row) : null;
     }
 
+    /** @return array<int, self> */
+    public static function all(): array
+    {
+        $rows = DatabaseManager::select('SELECT * FROM plans ORDER BY price ASC');
+
+        return array_map(self::fromRow(...), $rows);
+    }
+
     /** @param array<string, mixed> $row */
     private static function fromRow(array $row): self
     {

@@ -27,4 +27,11 @@ class EnvironmentManager
 
     }
 
+    public static function isProduction(): bool
+    {
+
+        return ($_ENV['APP_ENV'] ?? self::DEFAULT_ENVIRONMENT) === 'production';
+
+    }
+
 }

@@ -16,6 +16,7 @@
 
         {% block auth_form %}
             <form method="post" action="/login" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                 {{ input.field('email', 'Email', 'email', '', null) }}
                 {{ input.field('password', 'Password', 'password', '', null) }}
                 {{ button.submit('Login', 'primary', true) }}

@@ -16,20 +16,12 @@ class SubscriptionManager
 
     public const STATUS_TRIAL = 'trial';
 
-    public static function startTrial(int $customerId, int $trialDays = self::DEFAULT_TRIAL_DAYS): Subscription
+    public static function startTrial(int $customerId, int $planId, int $trialDays = self::DEFAULT_TRIAL_DAYS): Subscription
     {
-
-        $plan = Plan::default();
-
-        if ($plan === null) {
-
-            throw new \RuntimeException('No default plan is configured.');
-
-        }
 
         return Subscription::create([
             'customer_id' => $customerId,
-            'plan_id' => $plan->id,
+            'plan_id' => $planId,
             'status' => self::STATUS_TRIAL,
             'trial_ends_at' => date('Y-m-d H:i:s', strtotime("+{$trialDays} days")),
             'current_period_end' => null,

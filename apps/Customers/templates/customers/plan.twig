@@ -1,0 +1,48 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    {% import "components/link.twig" as link %}
+
+    <div class="plan-page">
+        <div class="plan-page-brand">Tanzeem</div>
+
+        <div class="plan-header">
+            <h1>Choose your plan</h1>
+            <p>Pick the plan that fits your team - you can change this later.</p>
+            <p class="plan-switch">{{ link.navigate('/signup', 'Start over') }}</p>
+        </div>
+
+        {% if error %}
+            <script>document.addEventListener('DOMContentLoaded', function () { if (window.Toast) { Toast.show({{ error|json_encode|raw }}, 'error'); } });</script>
+        {% endif %}
+
+        <form method="post" action="/signup/plan" class="plan-grid">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            {% for item in plans %}
+                <div class="plan-card{% if item.recommended %} plan-card--recommended{% endif %}">
+                    {% if item.recommended %}
+                        <span class="plan-badge">Recommended</span>
+                    {% endif %}
+
+                    <h2>{{ item.plan.name }}</h2>
+
+                    <p class="plan-price">Rs {{ item.plan.price|number_format(0) }}<span>/mo</span></p>
+
+                    <p class="plan-limit">Up to {{ item.plan.employee_limit }} employees</p>
+
+                    <button
+                        type="submit"
+                        name="plan_id"
+                        value="{{ item.plan.id }}"
+                        class="btn btn-{{ item.recommended ? 'primary' : 'secondary' }} btn-full"
+                        data-confirm-title="Confirm your plan"
+                        data-confirm="Continue with the {{ item.plan.name }} plan? You can switch plans anytime from the billing page."
+                    >
+                        <span class="btn-label">Choose {{ item.plan.name }}</span>
+                        <span class="btn-loader" hidden><span class="loader" aria-hidden="true"></span></span>
+                    </button>
+                </div>
+            {% endfor %}
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.twig" %}
+
+{% block content %}
+    {% embed "components/auth-shell.twig" with {
+        title: 'Verify your identity',
+        error: error,
+        switch_href: '/signup',
+        switch_text: 'Start over',
+    } %}
+        {% import "components/button.twig" as button %}
+
+        {% block auth_form %}
+            <p class="auth-hint">Enter the 6-digit verification code we sent you to finish signing up.</p>
+            <form method="post" action="/signup/verify" novalidate>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <div class="field">
+                    <label for="field_otp_0">Verification code</label>
+                    <div class="otp-boxes" data-otp-group>
+                        {% for i in 0..5 %}
+                            <input type="text" inputmode="numeric" pattern="\d*" maxlength="1" class="otp-box" id="field_otp_{{ i }}" autocomplete="one-time-code" data-otp-box>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="otp" id="field_otp" required>
+                    <div class="error"></div>
+                </div>
+                {{ button.submit('Verify', 'primary', true) }}
+            </form>
+        {% endblock %}
+    {% endembed %}
+{% endblock %}

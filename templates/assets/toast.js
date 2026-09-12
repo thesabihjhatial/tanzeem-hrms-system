@@ -36,19 +36,6 @@ window.Toast = (function () {
         var el = document.createElement('div');
         el.className = 'toast toast-' + (type || 'info');
         el.textContent = message;
-        var close = document.createElement('button');
-        close.type = 'button';
-        close.className = 'toast-close';
-        close.setAttribute('aria-label', 'Dismiss');
-        close.textContent = '×';
-
-        close.addEventListener('click', function () {
-        
-            dismiss(el);
-        
-        });
-        
-        el.appendChild(close);
 
         ensureContainer().appendChild(el);
         

@@ -5,7 +5,6 @@ namespace App\Tests\Utilities;
 use App\Tests\Support\BuildsCustomerRegistrationData;
 use App\Tests\Support\SeedsBillingSchema;
 use App\Utilities\AuthenticationManager;
-use App\Utilities\CustomerManager;
 use App\Utilities\DatabaseManager;
 use PHPUnit\Framework\TestCase;
 
@@ -21,7 +20,7 @@ class AuthenticationManagerTest extends TestCase
         $this->seedBillingSchema($pdo);
 
         $_SESSION = [];
-        CustomerManager::register($this->validRegistrationData());
+        $this->registerCustomer();
         $_SESSION = [];
     }
 
@@ -79,5 +78,49 @@ class AuthenticationManagerTest extends TestCase
         $this->assertNotNull($response);
         $this->assertSame(302, $response->status);
         $this->assertSame('/login', $response->headers['Location']);
+    }
+
+    public function test_attempt_locks_out_after_five_wrong_passwords(): void
+    {
+        for ($i = 0; $i < 5; $i++) {
+            AuthenticationManager::attempt('ada@acme.test', 'wrong password');
+        }
+
+        // Even the real password no longer works once locked out.
+        $this->assertNull(AuthenticationManager::attempt('ada@acme.test', 'correct horse battery staple'));
+    }
+
+    public function test_attempt_lockout_applies_equally_to_unknown_emails(): void
+    {
+        // A lockout must never behave differently for an email that has
+        // no account — otherwise the lockout itself becomes a way to
+        // enumerate which emails are registered.
+        for ($i = 0; $i < 5; $i++) {
+            AuthenticationManager::attempt('nobody@acme.test', 'wrong password');
+        }
+
+        $row = DatabaseManager::selectOne('SELECT locked_until FROM login_throttles WHERE email = ?', ['nobody@acme.test']);
+
+        $this->assertNotNull($row['locked_until']);
+    }
+
+    public function test_check_expires_the_session_after_the_absolute_timeout(): void
+    {
+        AuthenticationManager::attemptLogin('ada@acme.test', 'correct horse battery staple');
+        $this->assertTrue(AuthenticationManager::check());
+
+        $_SESSION['authenticated_at'] = time() - AuthenticationManager::SESSION_TIMEOUT_SECONDS - 1;
+
+        $this->assertFalse(AuthenticationManager::check());
+    }
+
+    public function test_check_logs_out_a_session_whose_user_no_longer_exists(): void
+    {
+        $user = AuthenticationManager::attempt('ada@acme.test', 'correct horse battery staple');
+        AuthenticationManager::login($user);
+
+        DatabaseManager::execute('DELETE FROM users WHERE id = ?', [$user->id]);
+
+        $this->assertFalse(AuthenticationManager::check());
     }
 }

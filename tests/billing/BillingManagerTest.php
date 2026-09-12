@@ -6,7 +6,6 @@ use App\Apps\Billing\Models\Subscription;
 use App\Tests\Support\BuildsCustomerRegistrationData;
 use App\Tests\Support\SeedsBillingSchema;
 use App\Utilities\BillingManager;
-use App\Utilities\CustomerManager;
 use App\Utilities\DatabaseManager;
 use PHPUnit\Framework\TestCase;
 
@@ -24,7 +23,8 @@ class BillingManagerTest extends TestCase
         $pdo = DatabaseManager::connect(['driver' => 'sqlite', 'database' => ':memory:']);
         $this->seedBillingSchema($pdo);
 
-        $result = CustomerManager::register($this->validRegistrationData());
+        $_SESSION = [];
+        $result = $this->registerCustomer();
         $this->customerId = $result['customer']->id;
         $this->subscriptionId = $result['subscription']->id;
     }

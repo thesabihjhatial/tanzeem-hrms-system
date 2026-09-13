@@ -65,6 +65,7 @@ CREATE TABLE `employee_info` (
   `phone` varchar(20) DEFAULT NULL,
   `city` varchar(100) DEFAULT NULL,
   `id_number` varchar(50) DEFAULT NULL,
+  `photo` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `employee_id` (`employee_id`),
@@ -136,7 +137,7 @@ CREATE TABLE `logs` (
   PRIMARY KEY (`id`),
   KEY `level` (`level`),
   KEY `created_at` (`created_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `otps`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

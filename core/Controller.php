@@ -2,6 +2,7 @@
 
 namespace App\Core;
 
+use App\Utilities\CsrfManager;
 use App\Utilities\EmployeeManager;
 use App\Utilities\FlashManager;
 
@@ -12,6 +13,7 @@ abstract class Controller
     {
         $data['flash_messages'] ??= FlashManager::consume();
         $data['current_employee'] ??= EmployeeManager::currentEmployeeProfile();
+        $data['csrf_token'] ??= CsrfManager::token();
 
         return Response::html(View::render($template, $data));
     }

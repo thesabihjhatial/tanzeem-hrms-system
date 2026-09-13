@@ -83,6 +83,7 @@ trait SeedsBillingSchema
                 phone TEXT,
                 city TEXT,
                 id_number TEXT UNIQUE,
+                photo TEXT,
                 created_at TEXT
             )
             SQL);

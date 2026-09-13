@@ -16,6 +16,7 @@ class EmployeeInfo
         public readonly ?string $phone,
         public readonly ?string $city,
         public readonly ?string $id_number,
+        public readonly ?string $photo,
     ) {
     }
 
@@ -72,6 +73,11 @@ class EmployeeInfo
         return self::findByEmployeeId($data['employee_id']);
     }
 
+    public static function updatePhoto(int $employeeId, ?string $photo): bool
+    {
+        return DatabaseManager::execute('UPDATE employee_info SET photo = ? WHERE employee_id = ?', [$photo, $employeeId]);
+    }
+
     /** @param array<string, mixed> $row */
     private static function fromRow(array $row): self
     {
@@ -85,6 +91,7 @@ class EmployeeInfo
             $row['phone'],
             $row['city'],
             $row['id_number'],
+            $row['photo'],
         );
     }
 }

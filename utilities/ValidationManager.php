@@ -1,7 +1,7 @@
 <?php
 
 // Tanzeem HRMS System Validation Manager developed and maintained by Sabih
-// All user input is validated and sanitized to ensure integrity and prevent vulnerabilities
+// All customer input is validated and sanitized to ensure integrity and prevent vulnerabilities
 
 namespace App\Utilities;
 
@@ -27,7 +27,7 @@ class ValidationManager
         'throwawaymail.com',
         'trashmail.com',
         'yopmail.com'
-        
+
     ];
 
     private const PASSWORD_MAX_LENGTH = 128;

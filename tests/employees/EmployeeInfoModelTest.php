@@ -23,9 +23,21 @@ class EmployeeInfoModelTest extends TestCase
                 phone TEXT,
                 city TEXT,
                 id_number TEXT UNIQUE,
+                photo TEXT,
                 created_at TEXT
             )
             SQL);
+    }
+
+    public function test_update_photo_sets_and_clears_the_photo_filename(): void
+    {
+        EmployeeInfo::create(['employee_id' => 1, 'first_name' => 'Ada', 'last_name' => 'Lovelace']);
+
+        EmployeeInfo::updatePhoto(1, 'abc123.jpg');
+        $this->assertSame('abc123.jpg', EmployeeInfo::findByEmployeeId(1)->photo);
+
+        EmployeeInfo::updatePhoto(1, null);
+        $this->assertNull(EmployeeInfo::findByEmployeeId(1)->photo);
     }
 
     public function test_it_creates_and_reads_an_employee_info_row(): void

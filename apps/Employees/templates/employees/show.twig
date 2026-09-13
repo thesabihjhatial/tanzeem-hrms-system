@@ -6,6 +6,22 @@
 
     {% embed "components/layout.twig" %}
         {% block dashboard_content %}
+            {% import "components/avatar.twig" as avatar %}
+            <div class="employee-photo-row">
+                <div class="{% if can_edit_photo %}photo-upload-wrap{% endif %}">
+                    {{ avatar.avatar(employee.photo_url ?? null, 'employee-avatar') }}
+                    {% if can_edit_photo %}
+                        <form class="photo-upload-overlay" action="/employees/{{ employee.uuid }}/photo" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <label class="photo-upload-label">
+                                Change employee photo
+                                <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" onchange="this.form.submit()">
+                            </label>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+
             <div class="stat-cards">
                 <div class="stat-card">
                     <div class="stat-card-label">Employee ID</div>

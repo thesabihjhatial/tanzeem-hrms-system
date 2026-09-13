@@ -4,13 +4,16 @@
     go through this macro so that wiring up real employee/user photos
     later (once that feature exists) is a one-file change instead of a
     hunt through every place an avatar is drawn.
+
+    If the photo fails to load (deleted file, bad URL, etc.), the img
+    swaps itself out for the same fallback icon instead of showing a
+    broken-image glyph.
 #}
 {% macro avatar(photoUrl, extraClass) %}
     <span class="avatar{% if extraClass %} {{ extraClass }}{% endif %}">
         {% if photoUrl %}
-            <img src="{{ photoUrl }}" alt="">
-        {% else %}
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <img src="{{ photoUrl }}" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='';">
         {% endif %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"{% if photoUrl %} style="display:none;"{% endif %}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     </span>
 {% endmacro %}

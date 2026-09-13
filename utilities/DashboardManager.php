@@ -39,7 +39,7 @@ class DashboardManager
 
     }
 
-    /** @return array{employee_id: ?string, uuid: string, name: string, department: ?string, designation: ?string, email: string, phone: ?string, city: ?string} */
+    /** @return array{employee_id: ?string, uuid: string, name: string, department: ?string, designation: ?string, email: string, phone: ?string, city: ?string, photo_url: ?string} */
     private static function youProfile(Employee $employee): array
     {
 
@@ -54,6 +54,7 @@ class DashboardManager
             'email' => $employee->email,
             'phone' => $info?->phone,
             'city' => $info?->city,
+            'photo_url' => $info?->photo !== null ? '/employees/' . $employee->uuid . '/photo' : null,
         ];
 
     }

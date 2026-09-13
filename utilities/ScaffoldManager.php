@@ -23,7 +23,6 @@ class ScaffoldManager
 
         mkdir("{$base}/templates/{$name}", 0755, true);
         mkdir("{$base}/static/{$name}", 0755, true);
-
         file_put_contents("{$base}/routes.php", self::routesStub($name));
 
         return $studly;
@@ -45,7 +44,6 @@ class ScaffoldManager
         $className = self::studly($name);
         $timestamp = date('YmdHis');
         $path = "{$dir}/{$timestamp}_" . self::snake($className) . '.php';
-
         file_put_contents($path, self::migrationStub($className));
 
         return $path;
@@ -75,7 +73,9 @@ class ScaffoldManager
         use App\\Core\\Router;
 
         return function (Router \$router): void {
+
             // \$router->get('/{$name}', ...);
+        
         };
 
         PHP;
@@ -92,11 +92,15 @@ class ScaffoldManager
 
         class {$className} extends AbstractMigration
         {
+
             public function change(): void
             {
+
                 // \$table = \$this->table('table_name');
                 // \$table->addColumn('column_name', 'string')->create();
+
             }
+
         }
 
         PHP;

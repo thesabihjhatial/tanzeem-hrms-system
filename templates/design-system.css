@@ -223,6 +223,54 @@ table.ledger td.amount { text-align: right; font-weight: 600; }
 .you-details { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; gap: var(--sp-1); font-size: 13px; flex: 0 0 50%; min-width: 0; }
 .you-details li { display: flex; align-items: center; gap: var(--sp-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .you-details svg { width: 14px; height: 14px; color: var(--ink-soft); flex-shrink: 0; }
+@media (max-width: 480px) {
+    .you-profile { flex-direction: column; align-items: stretch; }
+    .you-avatar-col, .you-details { flex: 1 1 auto; width: 100%; }
+    .you-avatar { width: 120px; height: 120px; margin: 0 auto; }
+    .you-avatar svg { width: 40px; height: 40px; }
+}
+
+/* Employee photo upload — see you-card.twig and employees/show.twig. The
+   overlay is only in the markup at all when the viewer is an admin, so
+   viewers never see it, hover or not. */
+.photo-upload-wrap { position: relative; display: inline-flex; border-radius: 50%; }
+.photo-upload-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    transition: opacity 0.12s ease;
+    pointer-events: none;
+}
+.photo-upload-wrap:hover .photo-upload-overlay,
+.photo-upload-wrap:focus-within .photo-upload-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+.photo-upload-label {
+    display: block;
+    padding: var(--sp-2);
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    text-align: center;
+    cursor: pointer;
+}
+.photo-upload-label input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+.employee-photo-row { display: flex; align-items: center; gap: var(--sp-4); margin-bottom: var(--sp-4); }
+.employee-avatar { width: 96px; height: 96px; border-radius: 50%; background: var(--paper); color: var(--ink-soft); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.employee-avatar svg { width: 40px; height: 40px; }
 
 /* Pie chart — see components/pie-chart.twig */
 .pie-chart { display: block; width: 100%; max-width: 400px; height: auto; margin: 0 auto; overflow: visible; }
@@ -434,13 +482,16 @@ table.ledger td.amount { text-align: right; font-weight: 600; }
 }
 .profile-menu[hidden] { display: none; }
 .profile-menu a {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
     padding: var(--sp-2) var(--sp-3);
     border-radius: var(--radius);
     font-size: 14px;
     color: var(--ink);
     text-decoration: none;
 }
+.profile-menu .nav-icon { color: var(--ink-soft); }
 .profile-menu a:hover { background: var(--paper); }
 @media (max-width: 560px) {
     .profile-info { display: none; }

@@ -6,4 +6,6 @@ use App\Core\Router;
 return function (Router $router): void {
     $router->get('/employees', EmployeeController::class . '@index');
     $router->get('/employees/{uuid}', EmployeeController::class . '@show');
+    $router->get('/employees/{uuid}/photo', EmployeeController::class . '@showPhoto');
+    $router->post('/employees/{uuid}/photo', EmployeeController::class . '@uploadPhoto');
 };

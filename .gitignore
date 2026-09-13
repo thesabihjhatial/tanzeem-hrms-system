@@ -5,4 +5,6 @@
 !/storage/cache/.gitkeep
 /storage/logs/*
 !/storage/logs/.gitkeep
+/storage/employee-photos/*
+!/storage/employee-photos/.gitkeep
 /vendor/

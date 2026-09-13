@@ -29,7 +29,7 @@
                 {% embed "components/card.twig" with {title: 'You', free_layout: true} %}
                     {% block content %}
                         {% import "components/you-card.twig" as you_card %}
-                        {{ you_card.card(you) }}
+                        {{ you_card.card(you, csrf_token, is_admin) }}
                     {% endblock %}
                 {% endembed %}
 

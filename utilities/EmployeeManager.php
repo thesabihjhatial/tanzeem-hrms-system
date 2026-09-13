@@ -16,6 +16,10 @@ class EmployeeManager
 
     private const OWNER_EMPLOYEE_ID = '1';
 
+    private const PHOTO_ALLOWED_TYPES = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+
+    private const PHOTO_MAX_BYTES = 2 * 1024 * 1024;
+
     public const ROLE_ADMIN = 'admin';
 
     public const ROLE_VIEWER = 'viewer';
@@ -197,6 +201,111 @@ class EmployeeManager
 
     }
 
+    /**
+     * @param array{tmp_name?: string, size?: int, error?: int} $file the relevant slice of a $_FILES entry
+     * @return array{success: bool, error?: string}
+     */
+    public static function updatePhoto(int $customerId, string $targetUuid, array $file, bool $actingIsAdmin): array
+    {
+
+        $employee = self::findByUuid($customerId, $targetUuid);
+
+        if ($employee === null) {
+
+            return ['success' => false, 'error' => 'Employee not found.'];
+
+        }
+
+        if (!$actingIsAdmin) {
+
+            return ['success' => false, 'error' => 'Only an admin can update an employee\'s photo.'];
+
+        }
+
+        if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+
+            return ['success' => false, 'error' => 'Please choose a photo to upload.'];
+
+        }
+
+        if (($file['size'] ?? 0) > self::PHOTO_MAX_BYTES) {
+
+            return ['success' => false, 'error' => 'Photo must be smaller than 2MB.'];
+
+        }
+
+        // Trust getimagesize()'s sniffed mime type, not the extension or the
+        // browser-supplied Content-Type — both are attacker-controlled.
+        $imageInfo = @getimagesize($file['tmp_name'] ?? '');
+        $extension = $imageInfo !== false ? (self::PHOTO_ALLOWED_TYPES[$imageInfo['mime']] ?? null) : null;
+
+        if ($extension === null) {
+
+            return ['success' => false, 'error' => 'Photo must be a JPG, PNG, or WEBP image.'];
+
+        }
+
+        $storageDir = self::photoStorageDir();
+
+        if (!is_dir($storageDir) && !mkdir($storageDir, 0755, true) && !is_dir($storageDir)) {
+
+            return ['success' => false, 'error' => 'Could not save the photo. Please try again.'];
+
+        }
+
+        $filename = UuidManager::v4() . '.' . $extension;
+
+        if (!move_uploaded_file($file['tmp_name'], $storageDir . '/' . $filename)) {
+
+            return ['success' => false, 'error' => 'Could not save the photo. Please try again.'];
+
+        }
+
+        $previousPhoto = EmployeeInfo::findByEmployeeId($employee->id)?->photo;
+
+        EmployeeInfo::updatePhoto($employee->id, $filename);
+
+        if ($previousPhoto !== null) {
+
+            @unlink($storageDir . '/' . $previousPhoto);
+
+        }
+
+        return ['success' => true];
+
+    }
+
+    /** @return array{path: string, mime: string}|null */
+    public static function photoFile(int $customerId, string $uuid): ?array
+    {
+
+        $employee = self::findByUuid($customerId, $uuid);
+        $photo = $employee !== null ? EmployeeInfo::findByEmployeeId($employee->id)?->photo : null;
+
+        if ($photo === null) {
+
+            return null;
+
+        }
+
+        $path = self::photoStorageDir() . '/' . $photo;
+
+        if (!is_file($path)) {
+
+            return null;
+
+        }
+
+        // The extension was assigned by updatePhoto() itself from a
+        // getimagesize()-verified type, so mapping it back is reliable —
+        // and it avoids depending on the fileinfo extension being enabled.
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $mime = array_flip(self::PHOTO_ALLOWED_TYPES)[$extension] ?? 'application/octet-stream';
+
+        return ['path' => $path, 'mime' => $mime];
+
+    }
+
     /** @return array<string, mixed> */
     private static function toProfile(Employee $employee, ?EmployeeInfo $info): array
     {
@@ -214,7 +323,15 @@ class EmployeeManager
             'phone' => $info?->phone,
             'city' => $info?->city,
             'id_number' => $info?->id_number,
+            'photo_url' => $info?->photo !== null ? '/employees/' . $employee->uuid . '/photo' : null,
         ];
+
+    }
+
+    private static function photoStorageDir(): string
+    {
+
+        return dirname(__DIR__) . '/storage/employee-photos';
 
     }
 

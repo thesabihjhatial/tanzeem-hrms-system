@@ -24,12 +24,12 @@ class AuthenticationManagerTest extends TestCase
         $_SESSION = [];
     }
 
-    public function test_attempt_returns_the_user_on_correct_credentials(): void
+    public function test_attempt_returns_the_employee_on_correct_credentials(): void
     {
-        $user = AuthenticationManager::attempt('ada@acme.test', 'correct horse battery staple');
+        $employee = AuthenticationManager::attempt('ada@acme.test', 'correct horse battery staple');
 
-        $this->assertNotNull($user);
-        $this->assertSame('ada@acme.test', $user->email);
+        $this->assertNotNull($employee);
+        $this->assertSame('ada@acme.test', $employee->email);
     }
 
     public function test_attempt_returns_null_on_wrong_password(): void
@@ -44,12 +44,12 @@ class AuthenticationManagerTest extends TestCase
 
     public function test_login_populates_the_session(): void
     {
-        $user = AuthenticationManager::attempt('ada@acme.test', 'correct horse battery staple');
-        AuthenticationManager::login($user);
+        $employee = AuthenticationManager::attempt('ada@acme.test', 'correct horse battery staple');
+        AuthenticationManager::login($employee);
 
         $this->assertTrue(AuthenticationManager::check());
-        $this->assertSame($user->id, AuthenticationManager::userId());
-        $this->assertSame($user->customer_id, AuthenticationManager::customerId());
+        $this->assertSame($employee->id, AuthenticationManager::userId());
+        $this->assertSame($employee->customer_id, AuthenticationManager::customerId());
     }
 
     public function test_attempt_login_is_true_and_logs_in_on_success(): void
@@ -114,13 +114,28 @@ class AuthenticationManagerTest extends TestCase
         $this->assertFalse(AuthenticationManager::check());
     }
 
-    public function test_check_logs_out_a_session_whose_user_no_longer_exists(): void
+    public function test_check_logs_out_a_session_whose_employee_no_longer_exists(): void
     {
-        $user = AuthenticationManager::attempt('ada@acme.test', 'correct horse battery staple');
-        AuthenticationManager::login($user);
+        $employee = AuthenticationManager::attempt('ada@acme.test', 'correct horse battery staple');
+        AuthenticationManager::login($employee);
 
-        DatabaseManager::execute('DELETE FROM users WHERE id = ?', [$user->id]);
+        DatabaseManager::execute('DELETE FROM employees WHERE id = ?', [$employee->id]);
 
         $this->assertFalse(AuthenticationManager::check());
+    }
+
+    public function test_current_employee_returns_the_logged_in_employee(): void
+    {
+        AuthenticationManager::attemptLogin('ada@acme.test', 'correct horse battery staple');
+
+        $employee = AuthenticationManager::currentEmployee();
+
+        $this->assertNotNull($employee);
+        $this->assertSame('ada@acme.test', $employee->email);
+    }
+
+    public function test_current_employee_returns_null_when_not_authenticated(): void
+    {
+        $this->assertNull(AuthenticationManager::currentEmployee());
     }
 }

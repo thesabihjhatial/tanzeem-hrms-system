@@ -5,7 +5,7 @@
 namespace App\Utilities;
 
 use App\Apps\Customers\Models\LoginThrottle;
-use App\Apps\Customers\Models\User;
+use App\Apps\Employees\Models\Employee;
 use App\Core\Response;
 
 class AuthenticationManager
@@ -42,26 +42,26 @@ class AuthenticationManager
     public static function attemptLogin(string $email, string $password): bool
     {
 
-        $user = self::attempt($email, $password);
+        $employee = self::attempt($email, $password);
 
-        if ($user === null) {
+        if ($employee === null) {
 
             return false;
 
         }
 
-        self::login($user);
+        self::login($employee);
 
         return true;
 
     }
 
-    public static function attempt(string $email, string $password): ?User
+    public static function attempt(string $email, string $password): ?Employee
     {
 
-        $user = User::findByEmail($email);
+        $employee = Employee::findByEmail($email);
 
-        $passwordCorrect = password_verify($password, $user->password_hash ?? self::dummyHash());
+        $passwordCorrect = password_verify($password, $employee?->password_hash ?? self::dummyHash());
 
         $throttle = LoginThrottle::findByEmail($email);
 
@@ -71,7 +71,7 @@ class AuthenticationManager
 
         }
 
-        if ($user === null || $user->password_hash === null || !$passwordCorrect) {
+        if ($employee === null || $employee->password_hash === null || !$passwordCorrect) {
 
             LoginThrottle::recordFailure($email, self::MAX_LOGIN_ATTEMPTS, self::LOGIN_LOCKOUT_SECONDS);
 
@@ -81,11 +81,11 @@ class AuthenticationManager
 
         LoginThrottle::clear($email);
 
-        return $user;
+        return $employee;
 
     }
 
-    public static function login(User $user): void
+    public static function login(Employee $employee): void
     {
 
         if (session_status() === PHP_SESSION_ACTIVE) {
@@ -94,8 +94,8 @@ class AuthenticationManager
 
         }
 
-        $_SESSION[self::SESSION_USER_ID] = $user->id;
-        $_SESSION[self::SESSION_CUSTOMER_ID] = $user->customer_id;
+        $_SESSION[self::SESSION_USER_ID] = $employee->id;
+        $_SESSION[self::SESSION_CUSTOMER_ID] = $employee->customer_id;
         $_SESSION[self::SESSION_AUTHENTICATED_AT] = time();
 
     }
@@ -134,7 +134,7 @@ class AuthenticationManager
 
         }
 
-        if (User::find((int) $_SESSION[self::SESSION_USER_ID]) === null) {
+        if (Employee::find((int) $_SESSION[self::SESSION_CUSTOMER_ID], (int) $_SESSION[self::SESSION_USER_ID]) === null) {
 
             self::logout();
 
@@ -173,12 +173,13 @@ class AuthenticationManager
 
     }
 
-    public static function currentUser(): ?User
+    public static function currentEmployee(): ?Employee
     {
 
         $userId = self::userId();
+        $customerId = self::customerId();
 
-        return $userId !== null ? User::find($userId) : null;
+        return ($userId !== null && $customerId !== null) ? Employee::find($customerId, $userId) : null;
 
     }
 

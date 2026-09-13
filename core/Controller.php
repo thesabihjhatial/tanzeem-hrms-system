@@ -11,7 +11,7 @@ abstract class Controller
     protected function view(string $template, array $data = []): Response
     {
         $data['flash_messages'] ??= FlashManager::consume();
-        $data['current_user'] ??= AuthenticationManager::currentUser();
+        $data['current_employee'] ??= AuthenticationManager::currentEmployee();
 
         return Response::html(View::render($template, $data));
     }

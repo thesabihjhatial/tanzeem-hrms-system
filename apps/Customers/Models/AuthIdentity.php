@@ -13,7 +13,7 @@ class AuthIdentity
 {
     public function __construct(
         public readonly int $id,
-        public readonly int $user_id,
+        public readonly int $employee_id,
         public readonly string $provider,
         public readonly string $provider_user_id,
     ) {
@@ -29,12 +29,12 @@ class AuthIdentity
         return $row ? self::fromRow($row) : null;
     }
 
-    /** @param array{user_id: int, provider: string, provider_user_id: string} $data */
+    /** @param array{employee_id: int, provider: string, provider_user_id: string} $data */
     public static function create(array $data): self
     {
         DatabaseManager::execute(
-            'INSERT INTO auth_identities (user_id, provider, provider_user_id, created_at) VALUES (?, ?, ?, ?)',
-            [$data['user_id'], $data['provider'], $data['provider_user_id'], date('Y-m-d H:i:s')],
+            'INSERT INTO auth_identities (employee_id, provider, provider_user_id, created_at) VALUES (?, ?, ?, ?)',
+            [$data['employee_id'], $data['provider'], $data['provider_user_id'], date('Y-m-d H:i:s')],
         );
 
         return self::findByProvider($data['provider'], $data['provider_user_id']);
@@ -43,6 +43,6 @@ class AuthIdentity
     /** @param array<string, mixed> $row */
     private static function fromRow(array $row): self
     {
-        return new self((int) $row['id'], (int) $row['user_id'], $row['provider'], $row['provider_user_id']);
+        return new self((int) $row['id'], (int) $row['employee_id'], $row['provider'], $row['provider_user_id']);
     }
 }

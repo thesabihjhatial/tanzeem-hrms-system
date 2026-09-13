@@ -7,7 +7,7 @@ namespace App\Utilities;
 use App\Apps\Billing\Models\Plan;
 use App\Apps\Customers\Models\Customer;
 use App\Apps\Customers\Models\SignupOtp;
-use App\Apps\Customers\Models\User;
+use App\Apps\Employees\Models\Employee;
 
 class CustomerManager
 {
@@ -55,10 +55,6 @@ class CustomerManager
         'punjab' => 'Punjab',
         'sindh' => 'Sindh',
     ];
-
-    public const ROLE_ADMIN = 'admin';
-
-    public const ROLE_OWNER = 'owner';
 
     private const SESSION_PENDING_EMAIL_KEY = 'pending_signup_email';
 
@@ -112,7 +108,7 @@ class CustomerManager
 
         }
 
-        if (self::findUserByEmail($data['email']) !== null) {
+        if (self::findEmployeeByEmail($data['email']) !== null) {
 
             return ['success' => false, 'errors' => ['email' => self::ERROR_EMAIL_TAKEN]];
 
@@ -120,7 +116,7 @@ class CustomerManager
 
         $customerType = ($data['customer_type'] ?? 'individual') === 'company' ? 'company' : 'individual';
 
-        if (self::findUserByIdNumber($data['cnic']) !== null) {
+        if (self::findEmployeeByIdNumber($data['cnic']) !== null) {
 
             return ['success' => false, 'errors' => ['cnic' => $customerType === 'company' ? self::ERROR_NTN_TAKEN : self::ERROR_CNIC_TAKEN]];
 
@@ -137,7 +133,7 @@ class CustomerManager
                 'city' => $data['city'],
                 'employee_count_range' => $data['employee_count_range'],
             ],
-            'user' => [
+            'employee' => [
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'phone' => $data['phone'],
@@ -206,7 +202,7 @@ class CustomerManager
 
     }
 
-    /** @return array{success: bool, error?: string, customer?: Customer, user?: User, subscription?: \App\Apps\Billing\Models\Subscription} */
+    /** @return array{success: bool, error?: string, customer?: Customer, employee?: Employee, subscription?: \App\Apps\Billing\Models\Subscription} */
     public static function finalizeRegistration(int $planId): array
     {
 
@@ -232,16 +228,13 @@ class CustomerManager
 
             $customer = Customer::create($payload['customer']);
 
-            $role = $payload['customer']['customer_type'] === 'company' ? self::ROLE_OWNER : self::ROLE_ADMIN;
-
-            $user = User::create([
-                'customer_id' => $customer->id,
-                'name' => $payload['user']['name'],
-                'email' => $payload['user']['email'],
-                'phone' => $payload['user']['phone'],
-                'id_number' => $payload['user']['id_number'],
-                'password_hash' => $payload['user']['password_hash'],
-                'role' => $role,
+            $employee = EmployeeManager::createAdminEmployee($customer->id, [
+                'name' => $payload['employee']['name'],
+                'email' => $payload['employee']['email'],
+                'phone' => $payload['employee']['phone'],
+                'city' => $payload['customer']['city'],
+                'id_number' => $payload['employee']['id_number'],
+                'password_hash' => $payload['employee']['password_hash'],
             ]);
 
             $subscription = SubscriptionManager::startTrial($customer->id, $planId);
@@ -259,9 +252,9 @@ class CustomerManager
 
         SignupOtp::deleteByEmail($pendingOtp->email);
         unset($_SESSION[self::SESSION_PENDING_EMAIL_KEY], $_SESSION[self::SESSION_VERIFIED_KEY]);
-        AuthenticationManager::login($user);
+        AuthenticationManager::login($employee);
 
-        return ['success' => true, 'customer' => $customer, 'user' => $user, 'subscription' => $subscription];
+        return ['success' => true, 'customer' => $customer, 'employee' => $employee, 'subscription' => $subscription];
 
     }
 
@@ -297,17 +290,17 @@ class CustomerManager
 
     }
 
-    public static function findUserByEmail(string $email): ?User
+    public static function findEmployeeByEmail(string $email): ?Employee
     {
 
-        return User::findByEmail($email);
+        return EmployeeManager::findByEmail($email);
 
     }
 
-    public static function findUserByIdNumber(string $idNumber): ?User
+    public static function findEmployeeByIdNumber(string $idNumber): ?Employee
     {
 
-        return User::findByIdNumber($idNumber);
+        return EmployeeManager::findByIdNumber($idNumber);
 
     }
 

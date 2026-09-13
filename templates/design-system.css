@@ -179,6 +179,60 @@ table.ledger td.amount { text-align: right; font-weight: 600; }
 .stat-card-value { font-size: 26px; font-weight: 700; }
 .stat-card.accent .stat-card-value { color: var(--marigold); }
 .stat-card-suffix { font-size: 14px; font-weight: 500; color: var(--ink-soft); }
+.stat-card-value.status-success { color: var(--teal); }
+.stat-card-value.status-warning { color: var(--marigold); }
+.stat-card-value.status-danger { color: var(--brick); }
+
+/* Cards grid — see components/card.twig */
+.cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-4); }
+.cards.cards--three { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 900px) {
+    .cards { grid-template-columns: 1fr; }
+    .cards.cards--three { grid-template-columns: 1fr; }
+}
+@media (min-width: 901px) and (max-width: 1100px) {
+    .cards.cards--three { grid-template-columns: repeat(2, 1fr); }
+}
+.card {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: var(--sp-4);
+}
+.card-title { font-size: 15px; font-weight: 600; margin-bottom: var(--sp-3); }
+.card-body { display: flex; flex: 1; align-items: center; }
+.card-empty-note { color: var(--ink-soft); font-size: 14px; }
+
+/* You card — see apps/Dashboard/templates/dashboard/index.twig */
+.you-profile { display: flex; width: 100%; gap: var(--sp-4); align-items: center; }
+.you-avatar-col { display: flex; align-items: center; justify-content: center; flex: 0 0 50%; }
+.you-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--ink-soft);
+    flex-shrink: 0;
+}
+.you-avatar svg { width: 64px; height: 64px; }
+.you-details { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; gap: var(--sp-1); font-size: 13px; flex: 0 0 50%; min-width: 0; }
+.you-details li { display: flex; align-items: center; gap: var(--sp-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.you-details svg { width: 14px; height: 14px; color: var(--ink-soft); flex-shrink: 0; }
+
+/* Pie chart — see components/pie-chart.twig */
+.pie-chart { display: block; width: 100%; max-width: 400px; height: auto; margin: 0 auto; overflow: visible; }
+.pie-leader-line { fill: none; stroke: var(--ink-soft); stroke-width: 1; }
+.pie-leader-label { font-size: 11px; fill: var(--ink); }
+.card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-4); }
+.card-grid .stat-card { height: 100px; }
+@media (max-width: 420px) {
+    .card-grid { grid-template-columns: 1fr; }
+}
 .dashboard-welcome {
     font-size: 20px;
     font-weight: 600;
@@ -362,6 +416,8 @@ table.ledger td.amount { text-align: right; font-weight: 600; }
     flex-shrink: 0;
 }
 .profile-avatar svg { width: 18px; height: 18px; }
+.avatar { overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 .profile-caret { width: 16px; height: 16px; color: var(--ink-soft); flex-shrink: 0; transition: transform 0.15s ease; }
 .profile-trigger[aria-expanded="true"] .profile-caret { transform: rotate(180deg); }
 .profile-menu {

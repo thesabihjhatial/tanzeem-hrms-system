@@ -1,0 +1,19 @@
+{#
+    A titled container for grouping up to 4 stat-cards in a 2x2 grid.
+    Usage:
+        {% embed "components/card.twig" with {title: 'Overview'} %}
+            {% block content %}
+                {{ stat.card(...) }}
+                {{ stat.card(...) }}
+            {% endblock %}
+        {% endembed %}
+
+    Pass {free_layout: true} to opt out of the 2x2 grid for content that
+    isn't a set of stat-cards (e.g. a chart).
+#}
+<div class="card">
+    <div class="card-title">{{ title }}</div>
+    <div class="{{ free_layout ? 'card-body' : 'card-grid' }}">
+        {% block content %}{% endblock %}
+    </div>
+</div>

@@ -154,7 +154,7 @@ class CustomerController extends Controller
      */
     public function checkEmail(Request $request): Response
     {
-        $taken = CustomerManager::findUserByEmail($request->body['email'] ?? '') !== null;
+        $taken = CustomerManager::findEmployeeByEmail($request->body['email'] ?? '') !== null;
 
         return $this->json(['taken' => $taken]);
     }
@@ -166,7 +166,7 @@ class CustomerController extends Controller
      */
     public function checkCnic(Request $request): Response
     {
-        $taken = CustomerManager::findUserByIdNumber($request->body['cnic'] ?? '') !== null;
+        $taken = CustomerManager::findEmployeeByIdNumber($request->body['cnic'] ?? '') !== null;
 
         return $this->json(['taken' => $taken]);
     }

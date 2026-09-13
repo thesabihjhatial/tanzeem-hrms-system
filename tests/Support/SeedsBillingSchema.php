@@ -26,23 +26,9 @@ trait SeedsBillingSchema
             SQL);
 
         $pdo->exec(<<<SQL
-            CREATE TABLE users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                customer_id INTEGER NOT NULL,
-                name TEXT NOT NULL,
-                email TEXT NOT NULL UNIQUE,
-                phone TEXT,
-                id_number TEXT,
-                password_hash TEXT,
-                role TEXT NOT NULL,
-                created_at TEXT
-            )
-            SQL);
-
-        $pdo->exec(<<<SQL
             CREATE TABLE auth_identities (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
+                employee_id INTEGER NOT NULL,
                 provider TEXT NOT NULL,
                 provider_user_id TEXT NOT NULL,
                 created_at TEXT,
@@ -84,7 +70,12 @@ trait SeedsBillingSchema
                 email TEXT NOT NULL,
                 phone TEXT,
                 city TEXT,
-                created_at TEXT
+                password_hash TEXT,
+                role TEXT NOT NULL DEFAULT 'viewer',
+                id_number TEXT,
+                created_at TEXT,
+                UNIQUE (email),
+                UNIQUE (id_number)
             )
             SQL);
 

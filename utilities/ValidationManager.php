@@ -101,9 +101,6 @@ class ValidationManager
     public static function isValidNtn(string $ntn): bool
     {
 
-        // NTNs can be alphanumeric (FBR issues some as letters+digits),
-        // unlike CNIC/phone which are numeric-only — so the monotonous
-        // check here works on whatever characters are actually present.
         $normalized = strtoupper(preg_replace('/[\s\-]/', '', $ntn));
 
         return (bool) preg_match('/^[A-Z0-9]{7,8}$/', $normalized) && !self::isMonotonous($normalized);

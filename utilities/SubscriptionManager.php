@@ -14,7 +14,17 @@ class SubscriptionManager
 
     public const STATUS_ACTIVE = 'active';
 
+    public const STATUS_EXPIRED = 'expired';
+
+    public const STATUS_TERMINATED = 'terminated';
+
     public const STATUS_TRIAL = 'trial';
+
+    private const STATUS_VARIANTS = [
+        self::STATUS_ACTIVE => 'success',
+        self::STATUS_EXPIRED => 'warning',
+        self::STATUS_TERMINATED => 'danger',
+    ];
 
     public static function startTrial(int $customerId, int $planId, int $trialDays = self::DEFAULT_TRIAL_DAYS): Subscription
     {
@@ -33,6 +43,13 @@ class SubscriptionManager
     {
 
         return Subscription::forCustomer($customerId);
+
+    }
+
+    public static function statusVariant(string $status): ?string
+    {
+
+        return self::STATUS_VARIANTS[$status] ?? null;
 
     }
 

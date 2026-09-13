@@ -4,9 +4,9 @@
     a page wants to draw the eye to. Reusable across any page that needs
     to show a quick metric (dashboard overview, an employee's profile, etc).
 #}
-{% macro card(label, value, suffix, accent) %}
+{% macro card(label, value, suffix, accent, valueClass) %}
     <div class="stat-card{% if accent %} accent{% endif %}">
         <div class="stat-card-label">{{ label }}</div>
-        <div class="stat-card-value">{{ value }}{% if suffix %}<span class="stat-card-suffix"> {{ suffix }}</span>{% endif %}</div>
+        <div class="stat-card-value{% if valueClass %} {{ valueClass }}{% endif %}">{{ value }}{% if suffix %}<span class="stat-card-suffix"> {{ suffix }}</span>{% endif %}</div>
     </div>
 {% endmacro %}

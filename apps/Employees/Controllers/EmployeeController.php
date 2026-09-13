@@ -6,6 +6,7 @@ use App\Core\Controller;
 use App\Core\Request;
 use App\Core\Response;
 use App\Utilities\AuthenticationManager;
+use App\Utilities\ChartManager;
 use App\Utilities\EmployeeManager;
 
 class EmployeeController extends Controller
@@ -16,8 +17,12 @@ class EmployeeController extends Controller
             return $redirect;
         }
 
+        $customerId = AuthenticationManager::customerId();
+
         return $this->view('employees/index.twig', [
-            'employees' => EmployeeManager::listForCustomer(AuthenticationManager::customerId()),
+            'employees' => EmployeeManager::listForCustomer($customerId),
+            'department_breakdown' => ChartManager::pieWithLeaders(EmployeeManager::departmentBreakdown($customerId)),
+            'city_breakdown' => ChartManager::pieWithLeaders(EmployeeManager::cityBreakdown($customerId)),
         ]);
     }
 

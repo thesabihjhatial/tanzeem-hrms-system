@@ -4,8 +4,8 @@ use Phinx\Migration\AbstractMigration;
 
 /**
  * Dev convenience login: admin@tanzeem.pk / pak@123. Fixture data
- * inserted directly via Phinx, not through CustomerManager. Don't run
- * this against a real production database.
+ * inserted directly via Phinx, not through CustomerManager/EmployeeManager.
+ * Don't run this against a real production database.
  */
 class SeedTestCustomer extends AbstractMigration
 {
@@ -24,13 +24,15 @@ class SeedTestCustomer extends AbstractMigration
 
         $customerId = (int) $this->fetchRow("SELECT id FROM customers WHERE company_name = 'Test Company' ORDER BY id DESC LIMIT 1")['id'];
 
-        $this->table('users')->insert([
+        $this->table('employees')->insert([
             'customer_id' => $customerId,
-            'name' => 'Test User',
+            'employee_id' => '1',
+            'first_name' => 'Test',
+            'last_name' => 'User',
             'email' => 'admin@tanzeem.pk',
             'phone' => '03001234567',
             'password_hash' => password_hash('pak@123', PASSWORD_DEFAULT),
-            'role' => 'owner',
+            'role' => 'admin',
             'created_at' => $now,
         ])->saveData();
 
@@ -47,7 +49,7 @@ class SeedTestCustomer extends AbstractMigration
 
     public function down(): void
     {
-        // FK cascades (customers -> users, customers -> subscriptions) clean up the rest.
+        // FK cascades (customers -> employees, customers -> subscriptions) clean up the rest.
         $this->execute("DELETE FROM customers WHERE company_name = 'Test Company'");
     }
 }

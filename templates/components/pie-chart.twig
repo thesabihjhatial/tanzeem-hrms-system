@@ -1,0 +1,34 @@
+{#
+    A pie chart with leader-line labels (each wedge connects to its label
+    via a short wire), from segments already computed server-side by
+    ChartManager::pieWithLeaders() — this macro only renders the SVG,
+    it does no angle/geometry math itself.
+#}
+{% macro chart(segments) %}
+    {% if segments is empty %}
+        <p class="card-empty-note">No employee data yet.</p>
+    {% else %}
+        <svg class="pie-chart" viewBox="0 0 400 240" preserveAspectRatio="xMidYMid meet">
+            {% for segment in segments %}
+                {% if segment.is_full_circle %}
+                    <circle cx="200" cy="120" r="70" fill="{{ segment.color }}"></circle>
+                {% else %}
+                    <path d="{{ segment.path }}" fill="{{ segment.color }}"></path>
+                {% endif %}
+            {% endfor %}
+            {% for segment in segments %}
+                <polyline
+                    class="pie-leader-line"
+                    points="{{ segment.leader.x1 }},{{ segment.leader.y1 }} {{ segment.leader.x2 }},{{ segment.leader.y2 }} {{ segment.leader.x3 }},{{ segment.leader.y3 }}"
+                ></polyline>
+                <text
+                    class="pie-leader-label"
+                    x="{{ segment.leader.label_x }}"
+                    y="{{ segment.leader.label_y }}"
+                    text-anchor="{{ segment.leader.anchor }}"
+                    dominant-baseline="middle"
+                >{{ segment.label }} ({{ segment.count }})</text>
+            {% endfor %}
+        </svg>
+    {% endif %}
+{% endmacro %}

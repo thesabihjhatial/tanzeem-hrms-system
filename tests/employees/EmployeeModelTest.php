@@ -24,8 +24,11 @@ class EmployeeModelTest extends TestCase
                 email TEXT NOT NULL,
                 phone TEXT,
                 city TEXT,
+                password_hash TEXT,
+                role TEXT NOT NULL DEFAULT 'viewer',
+                id_number TEXT,
                 created_at TEXT,
-                UNIQUE (customer_id, email)
+                UNIQUE (email)
             )
             SQL);
     }
@@ -56,5 +59,37 @@ class EmployeeModelTest extends TestCase
     public function test_find_returns_null_for_missing_employee(): void
     {
         $this->assertNull(Employee::find(1, 999));
+    }
+
+    public function test_find_by_email_is_global_not_scoped_to_a_customer(): void
+    {
+        Employee::create(1, ['first_name' => 'Ada', 'last_name' => 'Lovelace', 'email' => 'ada@tanzeem.test']);
+
+        $employee = Employee::findByEmail('ada@tanzeem.test');
+
+        $this->assertNotNull($employee);
+        $this->assertSame(1, $employee->customer_id);
+    }
+
+    public function test_find_by_id_number_returns_null_when_not_set(): void
+    {
+        Employee::create(1, ['first_name' => 'Ada', 'last_name' => 'Lovelace', 'email' => 'ada@tanzeem.test']);
+
+        $this->assertNull(Employee::findByIdNumber('3520112345671'));
+    }
+
+    public function test_find_by_id_number_finds_a_match(): void
+    {
+        Employee::create(1, [
+            'first_name' => 'Ada',
+            'last_name' => 'Lovelace',
+            'email' => 'ada@tanzeem.test',
+            'id_number' => '3520112345671',
+        ]);
+
+        $employee = Employee::findByIdNumber('3520112345671');
+
+        $this->assertNotNull($employee);
+        $this->assertSame('ada@tanzeem.test', $employee->email);
     }
 }

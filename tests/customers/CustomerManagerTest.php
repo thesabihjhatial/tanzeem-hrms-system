@@ -29,7 +29,7 @@ class CustomerManagerTest extends TestCase
         ValidationManager::setPwnedChecker(fn (string $password): bool => false);
     }
 
-    public function test_register_creates_a_customer_and_its_first_user(): void
+    public function test_register_creates_a_customer_and_its_first_employee(): void
     {
         $result = $this->registerCustomer();
 
@@ -37,18 +37,19 @@ class CustomerManagerTest extends TestCase
         $this->assertSame('Acme Inc', $result['customer']->company_name);
         $this->assertSame('03001234567', $result['customer']->phone);
         $this->assertSame('punjab', $result['customer']->province);
-        $this->assertSame($result['customer']->id, $result['user']->customer_id);
-        $this->assertSame('03001234567', $result['user']->phone);
-        $this->assertSame('admin', $result['user']->role);
-        $this->assertTrue(password_verify('correct horse battery staple', $result['user']->password_hash));
+        $this->assertSame($result['customer']->id, $result['employee']->customer_id);
+        $this->assertSame('03001234567', $result['employee']->phone);
+        $this->assertSame('admin', $result['employee']->role);
+        $this->assertSame('1', $result['employee']->employee_id);
+        $this->assertTrue(password_verify('correct horse battery staple', $result['employee']->password_hash));
     }
 
-    public function test_register_gives_company_customers_the_owner_role(): void
+    public function test_register_gives_company_customers_the_admin_role_too(): void
     {
         $result = $this->registerCustomer(['customer_type' => 'company', 'cnic' => 'NTN123X']);
 
         $this->assertTrue($result['success']);
-        $this->assertSame('owner', $result['user']->role);
+        $this->assertSame('admin', $result['employee']->role);
     }
 
     public function test_register_also_starts_a_trial_subscription(): void
@@ -68,6 +69,16 @@ class CustomerManagerTest extends TestCase
 
         $this->assertFalse($result['success']);
         $this->assertArrayHasKey('email', $result['errors']);
+    }
+
+    public function test_register_rejects_a_duplicate_cnic(): void
+    {
+        $this->registerCustomer();
+
+        $result = CustomerManager::startRegistration($this->validRegistrationData(['company_name' => 'Other Inc', 'email' => 'other@acme.test']));
+
+        $this->assertFalse($result['success']);
+        $this->assertArrayHasKey('cnic', $result['errors']);
     }
 
     public function test_register_rejects_missing_required_fields(): void

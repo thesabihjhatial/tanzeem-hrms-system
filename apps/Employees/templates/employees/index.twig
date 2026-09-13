@@ -6,6 +6,22 @@
 
     {% embed "components/layout.twig" %}
         {% block dashboard_content %}
+            <div class="cards">
+                {% embed "components/card.twig" with {title: 'Employees by Department', free_layout: true} %}
+                    {% block content %}
+                        {% import "components/pie-chart.twig" as pie %}
+                        {{ pie.chart(department_breakdown) }}
+                    {% endblock %}
+                {% endembed %}
+
+                {% embed "components/card.twig" with {title: 'Employees by City', free_layout: true} %}
+                    {% block content %}
+                        {% import "components/pie-chart.twig" as pie %}
+                        {{ pie.chart(city_breakdown) }}
+                    {% endblock %}
+                {% endembed %}
+            </div>
+
             <div class="table-scroll">
                 <table class="ledger">
                     <thead>

@@ -3,11 +3,15 @@
 use Phinx\Migration\AbstractMigration;
 
 /**
- * Consolidated baseline for the Customers app's schema (previously four
- * separate migrations — customers, users, auth_identities, logs — now
- * squashed into one, since a fresh install imports sql/schema.sql
- * directly rather than replaying history). auth_identities isn't wired
- * to any OAuth flow yet; it's a landing place for that future work.
+ * Consolidated baseline for the Customers app's schema. Creates the
+ * `customers` and `logs` tables only. Login/auth now lives on employees
+ * (see apps/Employees/migrations) — there is no separate users table.
+ * auth_identities is created in its own later migration
+ * (create_auth_identities) since it needs the employees table to exist
+ * first for its foreign key. signup_otps and login_throttles are owned
+ * by their own pre-existing migrations (create_signup_otps_table,
+ * add_attempts_to_signup_otps, create_login_throttles_table) and are not
+ * created here.
  */
 class CreateCustomersSchema extends AbstractMigration
 {
@@ -16,6 +20,7 @@ class CreateCustomersSchema extends AbstractMigration
         $customers = $this->table('customers');
         $customers
             ->addColumn('company_name', 'string', ['limit' => 150])
+            ->addColumn('customer_type', 'string', ['limit' => 20, 'default' => 'individual'])
             ->addColumn('phone', 'string', ['limit' => 20])
             ->addColumn('province', 'string', ['limit' => 50])
             ->addColumn('city', 'string', ['limit' => 100])
@@ -27,29 +32,6 @@ class CreateCustomersSchema extends AbstractMigration
             ->addColumn('pessi_registration_no', 'string', ['limit' => 30, 'null' => true])
             ->addColumn('business_type', 'string', ['limit' => 30, 'null' => true])
             ->addColumn('created_at', 'datetime')
-            ->create();
-
-        $users = $this->table('users');
-        $users
-            ->addColumn('customer_id', 'integer', ['signed' => false])
-            ->addColumn('name', 'string', ['limit' => 100])
-            ->addColumn('email', 'string', ['limit' => 150])
-            ->addColumn('phone', 'string', ['limit' => 30, 'null' => true])
-            ->addColumn('password_hash', 'string', ['limit' => 255, 'null' => true])
-            ->addColumn('role', 'string', ['limit' => 20, 'default' => 'owner'])
-            ->addColumn('created_at', 'datetime')
-            ->addIndex(['email'], ['unique' => true])
-            ->addForeignKey('customer_id', 'customers', 'id', ['delete' => 'CASCADE'])
-            ->create();
-
-        $authIdentities = $this->table('auth_identities');
-        $authIdentities
-            ->addColumn('user_id', 'integer', ['signed' => false])
-            ->addColumn('provider', 'string', ['limit' => 50])
-            ->addColumn('provider_user_id', 'string', ['limit' => 255])
-            ->addColumn('created_at', 'datetime')
-            ->addIndex(['provider', 'provider_user_id'], ['unique' => true])
-            ->addForeignKey('user_id', 'users', 'id', ['delete' => 'CASCADE'])
             ->create();
 
         $logs = $this->table('logs');

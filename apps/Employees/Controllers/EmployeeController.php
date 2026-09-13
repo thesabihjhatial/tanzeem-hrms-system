@@ -20,19 +20,19 @@ class EmployeeController extends Controller
         $customerId = AuthenticationManager::customerId();
 
         return $this->view('employees/index.twig', [
-            'employees' => EmployeeManager::listForCustomer($customerId),
+            'employees' => EmployeeManager::listWithInfoForCustomer($customerId),
             'department_breakdown' => ChartManager::pieWithLeaders(EmployeeManager::departmentBreakdown($customerId)),
             'city_breakdown' => ChartManager::pieWithLeaders(EmployeeManager::cityBreakdown($customerId)),
         ]);
     }
 
-    public function show(Request $request, string $id): Response
+    public function show(Request $request, string $uuid): Response
     {
         if ($redirect = AuthenticationManager::guard()) {
             return $redirect;
         }
 
-        $employee = EmployeeManager::find(AuthenticationManager::customerId(), (int) $id);
+        $employee = EmployeeManager::profileForCustomer(AuthenticationManager::customerId(), $uuid);
 
         if ($employee === null) {
             return $this->notFound();

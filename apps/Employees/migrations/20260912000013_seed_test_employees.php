@@ -1,5 +1,6 @@
 <?php
 
+use App\Utilities\UuidManager;
 use Phinx\Migration\AbstractMigration;
 
 /**
@@ -22,6 +23,7 @@ class SeedTestEmployees extends AbstractMigration
 
         foreach ($employees as $employee) {
             $this->table('employees')->insert([
+                'uuid' => UuidManager::v4(),
                 'customer_id' => $customerId,
                 'employee_id' => $employee['employee_id'],
                 'first_name' => $employee['first_name'],

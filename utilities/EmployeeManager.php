@@ -5,6 +5,7 @@
 namespace App\Utilities;
 
 use App\Apps\Employees\Models\Employee;
+use App\Apps\Employees\Models\EmployeeInfo;
 
 class EmployeeManager
 {
@@ -27,10 +28,62 @@ class EmployeeManager
 
     }
 
+    /** @return array<int, array<string, mixed>> */
+    public static function listWithInfoForCustomer(int $customerId): array
+    {
+
+        $infoByEmployeeId = EmployeeInfo::allForCustomer($customerId);
+
+        return array_map(
+            fn (Employee $employee) => self::toProfile($employee, $infoByEmployeeId[$employee->id] ?? null),
+            self::listForCustomer($customerId),
+        );
+
+    }
+
+    /** @return array<string, mixed>|null */
+    public static function profileForCustomer(int $customerId, string $uuid): ?array
+    {
+
+        $employee = self::findByUuid($customerId, $uuid);
+
+        if ($employee === null) {
+
+            return null;
+
+        }
+
+        return self::toProfile($employee, EmployeeInfo::findByEmployeeId($employee->id));
+
+    }
+
+    /** @return array<string, mixed>|null */
+    public static function currentEmployeeProfile(): ?array
+    {
+
+        $employee = AuthenticationManager::currentEmployee();
+
+        if ($employee === null) {
+
+            return null;
+
+        }
+
+        return self::toProfile($employee, EmployeeInfo::findByEmployeeId($employee->id));
+
+    }
+
     public static function find(int $customerId, int $id): ?Employee
     {
 
         return Employee::find($customerId, $id);
+
+    }
+
+    public static function findByUuid(int $customerId, string $uuid): ?Employee
+    {
+
+        return Employee::findByUuid($customerId, $uuid);
 
     }
 
@@ -41,10 +94,10 @@ class EmployeeManager
 
     }
 
-    public static function findByIdNumber(string $idNumber): ?Employee
+    public static function findByIdNumber(string $idNumber): ?EmployeeInfo
     {
 
-        return Employee::findByIdNumber($idNumber);
+        return EmployeeInfo::findByIdNumber($idNumber);
 
     }
 
@@ -60,19 +113,25 @@ class EmployeeManager
 
         }
 
-        return Employee::create($customerId, [
+        $employee = Employee::create($customerId, [
             'employee_id' => $employeeId,
+            'email' => $data['email'],
+            'password_hash' => $data['password_hash'] ?? null,
+            'role' => $data['role'] ?? self::ROLE_VIEWER,
+        ]);
+
+        EmployeeInfo::create([
+            'employee_id' => $employee->id,
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'department' => $data['department'] ?? null,
             'designation' => $data['designation'] ?? null,
-            'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
             'city' => $data['city'] ?? null,
-            'password_hash' => $data['password_hash'] ?? null,
-            'role' => $data['role'] ?? self::ROLE_VIEWER,
             'id_number' => $data['id_number'] ?? null,
         ]);
+
+        return $employee;
 
     }
 
@@ -110,7 +169,9 @@ class EmployeeManager
     public static function departmentBreakdown(int $customerId): array
     {
 
-        return self::breakdownBy($customerId, fn (Employee $employee) => $employee->department);
+        $infoByEmployeeId = EmployeeInfo::allForCustomer($customerId);
+
+        return self::breakdownBy($customerId, fn (Employee $employee) => ($infoByEmployeeId[$employee->id] ?? null)?->department);
 
     }
 
@@ -118,7 +179,42 @@ class EmployeeManager
     public static function cityBreakdown(int $customerId): array
     {
 
-        return self::breakdownBy($customerId, fn (Employee $employee) => $employee->city);
+        $infoByEmployeeId = EmployeeInfo::allForCustomer($customerId);
+
+        return self::breakdownBy($customerId, fn (Employee $employee) => ($infoByEmployeeId[$employee->id] ?? null)?->city);
+
+    }
+
+    public static function hiresThisMonth(int $customerId): int
+    {
+
+        $thisMonth = date('Y-m');
+
+        return count(array_filter(
+            self::listForCustomer($customerId),
+            fn (Employee $employee) => str_starts_with($employee->created_at, $thisMonth),
+        ));
+
+    }
+
+    /** @return array<string, mixed> */
+    private static function toProfile(Employee $employee, ?EmployeeInfo $info): array
+    {
+
+        return [
+            'id' => $employee->id,
+            'uuid' => $employee->uuid,
+            'employee_id' => $employee->employee_id,
+            'role' => $employee->role,
+            'first_name' => $info?->first_name,
+            'last_name' => $info?->last_name,
+            'email' => $employee->email,
+            'department' => $info?->department,
+            'designation' => $info?->designation,
+            'phone' => $info?->phone,
+            'city' => $info?->city,
+            'id_number' => $info?->id_number,
+        ];
 
     }
 

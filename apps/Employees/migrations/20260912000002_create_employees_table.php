@@ -8,6 +8,7 @@ class CreateEmployeesTable extends AbstractMigration
     {
         $table = $this->table('employees');
         $table
+            ->addColumn('uuid', 'string', ['limit' => 36])
             ->addColumn('customer_id', 'integer', ['signed' => false])
             ->addColumn('employee_id', 'string', ['limit' => 50, 'null' => true])
             ->addColumn('first_name', 'string', ['limit' => 100])
@@ -22,6 +23,7 @@ class CreateEmployeesTable extends AbstractMigration
             ->addColumn('id_number', 'string', ['limit' => 50, 'null' => true])
             ->addColumn('created_at', 'datetime')
             ->addColumn('updated_at', 'datetime', ['null' => true])
+            ->addIndex(['uuid'], ['unique' => true])
             ->addIndex(['customer_id', 'employee_id'], ['unique' => true])
             ->addIndex(['email'], ['unique' => true])
             ->addIndex(['id_number'], ['unique' => true])

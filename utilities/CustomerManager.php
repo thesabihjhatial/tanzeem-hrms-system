@@ -8,6 +8,7 @@ use App\Apps\Billing\Models\Plan;
 use App\Apps\Customers\Models\Customer;
 use App\Apps\Customers\Models\SignupOtp;
 use App\Apps\Employees\Models\Employee;
+use App\Apps\Employees\Models\EmployeeInfo;
 
 class CustomerManager
 {
@@ -297,7 +298,7 @@ class CustomerManager
 
     }
 
-    public static function findEmployeeByIdNumber(string $idNumber): ?Employee
+    public static function findEmployeeByIdNumber(string $idNumber): ?EmployeeInfo
     {
 
         return EmployeeManager::findByIdNumber($idNumber);

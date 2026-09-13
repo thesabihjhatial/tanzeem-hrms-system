@@ -2,7 +2,7 @@
 
 namespace App\Core;
 
-use App\Utilities\AuthenticationManager;
+use App\Utilities\EmployeeManager;
 use App\Utilities\FlashManager;
 
 abstract class Controller
@@ -11,7 +11,7 @@ abstract class Controller
     protected function view(string $template, array $data = []): Response
     {
         $data['flash_messages'] ??= FlashManager::consume();
-        $data['current_employee'] ??= AuthenticationManager::currentEmployee();
+        $data['current_employee'] ??= EmployeeManager::currentEmployeeProfile();
 
         return Response::html(View::render($template, $data));
     }

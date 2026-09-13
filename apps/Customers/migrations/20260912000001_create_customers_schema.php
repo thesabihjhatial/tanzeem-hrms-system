@@ -8,9 +8,9 @@ use Phinx\Migration\AbstractMigration;
  * (see apps/Employees/migrations) — there is no separate users table.
  * auth_identities is created in its own later migration
  * (create_auth_identities) since it needs the employees table to exist
- * first for its foreign key. signup_otps and login_throttles are owned
- * by their own pre-existing migrations (create_signup_otps_table,
- * add_attempts_to_signup_otps, create_login_throttles_table) and are not
+ * first for its foreign key. otps and login_throttles are owned
+ * by their own pre-existing migrations (create_otps_table,
+ * add_attempts_to_otps, create_login_throttles_table) and are not
  * created here.
  */
 class CreateCustomersSchema extends AbstractMigration

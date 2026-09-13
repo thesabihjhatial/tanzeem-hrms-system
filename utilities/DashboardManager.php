@@ -6,6 +6,7 @@ namespace App\Utilities;
 
 use App\Apps\Billing\Models\Plan;
 use App\Apps\Employees\Models\Employee;
+use App\Apps\Employees\Models\EmployeeInfo;
 
 class DashboardManager
 {
@@ -15,15 +16,18 @@ class DashboardManager
     {
 
         $employee = Employee::find($customerId, $userId);
+        $you = $employee !== null ? self::youProfile($employee) : null;
         $subscription = SubscriptionManager::forCustomer($customerId);
         $plan = $subscription !== null ? Plan::find($subscription->plan_id) : null;
 
         return [
             'greeting' => self::greeting(),
-            'user_name' => $employee !== null ? trim($employee->first_name . ' ' . $employee->last_name) : null,
-            'you' => $employee !== null ? self::youProfile($employee) : null,
+            'user_name' => $you['name'] ?? null,
+            'you' => $you,
+            'is_admin' => $employee?->role === EmployeeManager::ROLE_ADMIN,
             'employee_count' => count(EmployeeManager::listForCustomer($customerId)),
             'employee_limit' => $plan?->employee_limit,
+            'employee_hires_this_month' => EmployeeManager::hiresThisMonth($customerId),
             'is_trial' => $subscription?->status === 'trial',
             'plan_name' => $plan?->name,
             'plan_billing_cycle' => $plan?->billing_cycle,
@@ -35,18 +39,21 @@ class DashboardManager
 
     }
 
-    /** @return array{employee_id: ?string, name: string, department: ?string, designation: ?string, email: string, phone: ?string, city: ?string} */
+    /** @return array{employee_id: ?string, uuid: string, name: string, department: ?string, designation: ?string, email: string, phone: ?string, city: ?string} */
     private static function youProfile(Employee $employee): array
     {
 
+        $info = EmployeeInfo::findByEmployeeId($employee->id);
+
         return [
             'employee_id' => $employee->employee_id,
-            'name' => trim($employee->first_name . ' ' . $employee->last_name),
-            'department' => $employee->department,
-            'designation' => $employee->designation,
+            'uuid' => $employee->uuid,
+            'name' => $info !== null ? trim($info->first_name . ' ' . $info->last_name) : '',
+            'department' => $info?->department,
+            'designation' => $info?->designation,
             'email' => $employee->email,
-            'phone' => $employee->phone,
-            'city' => $employee->city,
+            'phone' => $info?->phone,
+            'city' => $info?->city,
         ];
 
     }

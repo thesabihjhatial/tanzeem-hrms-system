@@ -1,6 +1,7 @@
 <?php
 
 // Tanzeem HRMS System Validation Manager developed and maintained by Sabih
+// All user input is validated and sanitized to ensure integrity and prevent vulnerabilities
 
 namespace App\Utilities;
 
@@ -12,6 +13,7 @@ class ValidationManager
     private const COMMON_PASSWORD_PATTERNS = '/(12345|password|qwerty|abc123|123456789)/i';
 
     private const DISPOSABLE_EMAIL_DOMAINS = [
+
         '10minutemail.com',
         'dispostable.com',
         'fakeinbox.com',
@@ -24,7 +26,8 @@ class ValidationManager
         'tempmail.com',
         'throwawaymail.com',
         'trashmail.com',
-        'yopmail.com',
+        'yopmail.com'
+        
     ];
 
     private const PASSWORD_MAX_LENGTH = 128;

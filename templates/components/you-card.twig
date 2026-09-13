@@ -1,0 +1,28 @@
+{#
+    The current user's profile summary — avatar plus key details (employee ID,
+    name, department, designation, email, phone, city). Meant to be dropped
+    into a {% embed "components/card.twig" with {free_layout: true} %} block,
+    the same way stat-card.twig's macro is used inside a card.twig grid.
+#}
+{% macro card(you) %}
+    {% if you %}
+        {% import "components/avatar.twig" as avatar %}
+        {% import "components/link.twig" as link %}
+        <div class="you-profile">
+            <div class="you-avatar-col">
+                {{ avatar.avatar(you.photo_url ?? null, 'you-avatar') }}
+            </div>
+            <ul class="you-details">
+                <li title="Employee ID"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="9" x2="10" y2="9"/><line x1="7" y1="13" x2="13" y2="13"/></svg>{{ you.employee_id ?? '—' }}</li>
+                <li title="Name"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>{{ link.navigate('/employees/' ~ you.uuid, you.name) }}</li>
+                <li title="Department"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>{{ you.department ?? '—' }}</li>
+                <li title="Designation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-3V5a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v2H8a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2Z"/><path d="M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2H9Z"/></svg>{{ you.designation ?? '—' }}</li>
+                <li title="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>{{ you.email }}</li>
+                <li title="Phone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>{{ you.phone ?? '—' }}</li>
+                <li title="City"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>{{ you.city ?? '—' }}</li>
+            </ul>
+        </div>
+    {% else %}
+        <p class="card-empty-note">No data available.</p>
+    {% endif %}
+{% endmacro %}

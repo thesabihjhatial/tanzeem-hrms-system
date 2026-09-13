@@ -3,23 +3,19 @@
 namespace App\Apps\Employees\Models;
 
 use App\Utilities\DatabaseManager;
+use App\Utilities\UuidManager;
 
 class Employee
 {
     public function __construct(
         public readonly int $id,
+        public readonly string $uuid,
         public readonly int $customer_id,
         public readonly ?string $employee_id,
-        public readonly string $first_name,
-        public readonly string $last_name,
-        public readonly ?string $department,
-        public readonly ?string $designation,
         public readonly string $email,
-        public readonly ?string $phone,
-        public readonly ?string $city,
         public readonly ?string $password_hash,
         public readonly string $role,
-        public readonly ?string $id_number,
+        public readonly string $created_at,
     ) {
     }
 
@@ -45,9 +41,9 @@ class Employee
         return $row ? self::fromRow($row) : null;
     }
 
-    public static function findByIdNumber(string $idNumber): ?self
+    public static function findByUuid(int $customerId, string $uuid): ?self
     {
-        $row = DatabaseManager::selectOne('SELECT * FROM employees WHERE id_number = ?', [$idNumber]);
+        $row = DatabaseManager::selectOne('SELECT * FROM employees WHERE customer_id = ? AND uuid = ?', [$customerId, $uuid]);
 
         return $row ? self::fromRow($row) : null;
     }
@@ -67,24 +63,18 @@ class Employee
         return $max;
     }
 
-    /** @param array{employee_id?: ?string, first_name: string, last_name: string, department?: ?string, designation?: ?string, email: string, phone?: ?string, city?: ?string, password_hash?: ?string, role?: string, id_number?: ?string} $data */
+    /** @param array{employee_id?: ?string, email: string, password_hash?: ?string, role?: string} $data */
     public static function create(int $customerId, array $data): self
     {
         DatabaseManager::execute(
-            'INSERT INTO employees (customer_id, employee_id, first_name, last_name, department, designation, email, phone, city, password_hash, role, id_number, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO employees (uuid, customer_id, employee_id, email, password_hash, role, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
             [
+                UuidManager::v4(),
                 $customerId,
                 $data['employee_id'] ?? null,
-                $data['first_name'],
-                $data['last_name'],
-                $data['department'] ?? null,
-                $data['designation'] ?? null,
                 $data['email'],
-                $data['phone'] ?? null,
-                $data['city'] ?? null,
                 $data['password_hash'] ?? null,
                 $data['role'] ?? 'viewer',
-                $data['id_number'] ?? null,
                 date('Y-m-d H:i:s'),
             ],
         );
@@ -97,18 +87,13 @@ class Employee
     {
         return new self(
             (int) $row['id'],
+            $row['uuid'],
             (int) $row['customer_id'],
             $row['employee_id'],
-            $row['first_name'],
-            $row['last_name'],
-            $row['department'],
-            $row['designation'],
             $row['email'],
-            $row['phone'],
-            $row['city'],
             $row['password_hash'],
             $row['role'],
-            $row['id_number'],
+            $row['created_at'],
         );
     }
 }

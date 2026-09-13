@@ -37,7 +37,7 @@ trait SeedsBillingSchema
             SQL);
 
         $pdo->exec(<<<SQL
-            CREATE TABLE signup_otps (
+            CREATE TABLE otps (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email TEXT NOT NULL UNIQUE,
                 otp_hash TEXT NOT NULL,
@@ -61,21 +61,29 @@ trait SeedsBillingSchema
         $pdo->exec(<<<SQL
             CREATE TABLE employees (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                uuid TEXT NOT NULL,
                 customer_id INTEGER NOT NULL,
                 employee_id TEXT,
+                email TEXT NOT NULL,
+                password_hash TEXT,
+                role TEXT NOT NULL DEFAULT 'viewer',
+                created_at TEXT,
+                UNIQUE (email)
+            )
+            SQL);
+
+        $pdo->exec(<<<SQL
+            CREATE TABLE employee_info (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                employee_id INTEGER NOT NULL UNIQUE,
                 first_name TEXT NOT NULL,
                 last_name TEXT NOT NULL,
                 department TEXT,
                 designation TEXT,
-                email TEXT NOT NULL,
                 phone TEXT,
                 city TEXT,
-                password_hash TEXT,
-                role TEXT NOT NULL DEFAULT 'viewer',
-                id_number TEXT,
-                created_at TEXT,
-                UNIQUE (email),
-                UNIQUE (id_number)
+                id_number TEXT UNIQUE,
+                created_at TEXT
             )
             SQL);
 

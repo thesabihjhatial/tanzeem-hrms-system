@@ -1,6 +1,7 @@
 <?php
 
 // Tanzeem HRMS System Subscription Manager developed and maintained by Sabih
+// All subscription/plan operations are handled in here
 
 namespace App\Utilities;
 
@@ -16,25 +17,31 @@ class SubscriptionManager
 
     public const STATUS_EXPIRED = 'expired';
 
+    public const STATUS_PENDING = 'pending';
+
     public const STATUS_TERMINATED = 'terminated';
 
     public const STATUS_TRIAL = 'trial';
 
     private const STATUS_VARIANTS = [
+
         self::STATUS_ACTIVE => 'success',
         self::STATUS_EXPIRED => 'warning',
-        self::STATUS_TERMINATED => 'danger',
+        self::STATUS_TERMINATED => 'danger'
+
     ];
 
     public static function startTrial(int $customerId, int $planId, int $trialDays = self::DEFAULT_TRIAL_DAYS): Subscription
     {
 
         return Subscription::create([
+
             'customer_id' => $customerId,
             'plan_id' => $planId,
             'status' => self::STATUS_TRIAL,
             'trial_ends_at' => date('Y-m-d H:i:s', strtotime("+{$trialDays} days")),
-            'current_period_end' => null,
+            'current_period_end' => null
+            
         ]);
 
     }

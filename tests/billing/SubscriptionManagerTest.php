@@ -36,8 +36,9 @@ class SubscriptionManagerTest extends TestCase
         $pdo = DatabaseManager::connect(['driver' => 'sqlite', 'database' => ':memory:']);
 
         for ($i = 0; $i < 10; $i++) {
-            $pdo->exec("INSERT INTO employees (customer_id, first_name, last_name, email, created_at)
-                VALUES ({$this->customerId}, 'First{$i}', 'Last{$i}', 'employee{$i}@acme.test', '2026-01-01 00:00:00')");
+            $uuid = sprintf('00000000-0000-0000-0000-%012d', $i);
+            $pdo->exec("INSERT INTO employees (uuid, customer_id, email, created_at)
+                VALUES ('{$uuid}', {$this->customerId}, 'employee{$i}@acme.test', '2026-01-01 00:00:00')");
         }
 
         $this->assertFalse(SubscriptionManager::canAddEmployee($this->customerId));

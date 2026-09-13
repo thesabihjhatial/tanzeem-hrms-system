@@ -9,11 +9,11 @@ use Phinx\Migration\AbstractMigration;
  * server doesn't lose an in-progress signup. One row per email; a
  * fresh signup attempt for the same address replaces its row.
  */
-class CreateSignupOtpsTable extends AbstractMigration
+class CreateOtpsTable extends AbstractMigration
 {
     public function change(): void
     {
-        $table = $this->table('signup_otps');
+        $table = $this->table('otps');
         $table
             ->addColumn('email', 'string', ['limit' => 150])
             ->addColumn('otp_hash', 'string', ['limit' => 255])

@@ -2,6 +2,7 @@
 
 namespace App\Tests\Customers;
 
+use App\Apps\Employees\Models\EmployeeInfo;
 use App\Tests\Support\BuildsCustomerRegistrationData;
 use App\Tests\Support\SeedsBillingSchema;
 use App\Utilities\CustomerManager;
@@ -38,7 +39,7 @@ class CustomerManagerTest extends TestCase
         $this->assertSame('03001234567', $result['customer']->phone);
         $this->assertSame('punjab', $result['customer']->province);
         $this->assertSame($result['customer']->id, $result['employee']->customer_id);
-        $this->assertSame('03001234567', $result['employee']->phone);
+        $this->assertSame('03001234567', EmployeeInfo::findByEmployeeId($result['employee']->id)->phone);
         $this->assertSame('admin', $result['employee']->role);
         $this->assertSame('1', $result['employee']->employee_id);
         $this->assertTrue(password_verify('correct horse battery staple', $result['employee']->password_hash));
@@ -157,7 +158,7 @@ class CustomerManagerTest extends TestCase
         CustomerManager::startRegistration($this->validRegistrationData());
 
         DatabaseManager::execute(
-            "UPDATE signup_otps SET expires_at = datetime('now', '-1 hour') WHERE email = ?",
+            "UPDATE otps SET expires_at = datetime('now', '-1 hour') WHERE email = ?",
             ['ada@acme.test'],
         );
 

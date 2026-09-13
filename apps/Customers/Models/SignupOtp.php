@@ -19,7 +19,7 @@ class SignupOtp
 
     public static function findByEmail(string $email): ?self
     {
-        $row = DatabaseManager::selectOne('SELECT * FROM signup_otps WHERE email = ?', [$email]);
+        $row = DatabaseManager::selectOne('SELECT * FROM otps WHERE email = ?', [$email]);
 
         return $row ? self::fromRow($row) : null;
     }
@@ -43,7 +43,7 @@ class SignupOtp
         try {
 
             DatabaseManager::execute(
-                'INSERT INTO signup_otps (email, otp_hash, attempts, payload, expires_at, created_at) VALUES (?, ?, 0, ?, ?, ?)',
+                'INSERT INTO otps (email, otp_hash, attempts, payload, expires_at, created_at) VALUES (?, ?, 0, ?, ?, ?)',
                 [$data['email'], $data['otp_hash'], $data['payload'], $data['expires_at'], $now],
             );
 
@@ -52,7 +52,7 @@ class SignupOtp
             // A concurrent request for the same email won the insert race —
             // fold this attempt into an update instead of failing outright.
             DatabaseManager::execute(
-                'UPDATE signup_otps SET otp_hash = ?, attempts = 0, payload = ?, expires_at = ?, created_at = ? WHERE email = ?',
+                'UPDATE otps SET otp_hash = ?, attempts = 0, payload = ?, expires_at = ?, created_at = ? WHERE email = ?',
                 [$data['otp_hash'], $data['payload'], $data['expires_at'], $now, $data['email']],
             );
 
@@ -63,17 +63,17 @@ class SignupOtp
 
     public static function incrementAttempts(string $email): bool
     {
-        return DatabaseManager::execute('UPDATE signup_otps SET attempts = attempts + 1 WHERE email = ?', [$email]);
+        return DatabaseManager::execute('UPDATE otps SET attempts = attempts + 1 WHERE email = ?', [$email]);
     }
 
     public static function deleteByEmail(string $email): bool
     {
-        return DatabaseManager::execute('DELETE FROM signup_otps WHERE email = ?', [$email]);
+        return DatabaseManager::execute('DELETE FROM otps WHERE email = ?', [$email]);
     }
 
     public static function deleteExpired(): bool
     {
-        return DatabaseManager::execute('DELETE FROM signup_otps WHERE expires_at < ?', [date('Y-m-d H:i:s')]);
+        return DatabaseManager::execute('DELETE FROM otps WHERE expires_at < ?', [date('Y-m-d H:i:s')]);
     }
 
     public function isExpired(): bool
